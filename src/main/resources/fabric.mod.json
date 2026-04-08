@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "eternal-firework-rocket",
+  "version": "${version}",
+  "name": "Eternal Firework Rocket",
+  "description": "Adds eternal firework rockets that can be found in End City chests",
+  "authors": [
+    "xiaoze_qwq_"
+  ],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/eternal-firework-rocket/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "xiaoze_qwq_.eternal_firework_rocket.EternalFireworkRocket"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.18.4",
+    "minecraft": "~1.20.2",
+    "java": ">=17",
+    "fabric-api": "*"
+  }
+}
