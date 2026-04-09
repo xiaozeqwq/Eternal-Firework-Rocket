@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"package": "xiaoze_qwq_.eternal_firework_rocket.mixin.client",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"ExampleClientMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
