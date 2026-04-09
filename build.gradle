@@ -75,6 +75,22 @@ jar {
 	from("LICENSE") {
 		rename { "${it}_${inputs.properties.archivesName}"}
 	}
+
+	// 排除 .nomedia 和 .bak 文件
+	exclude '**/.nomedia'
+	exclude '**/*.bak'
+}
+
+// 配置 sourcesJar 任务，排除 .nomedia 和 .bak，并设置重复策略
+sourcesJar {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	exclude '**/.nomedia'
+	exclude '**/*.bak'
+}
+
+// 为所有 Jar 类型任务设置重复策略（确保其他 Jar 任务也安全）
+tasks.withType(Jar).configureEach {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 // configure the maven publication
@@ -93,4 +109,27 @@ publishing {
 		// The repositories here will be used for publishing your artifact, not for
 		// retrieving dependencies.
 	}
+}
+
+task listAllDependencyClasses {
+    notCompatibleWithConfigurationCache()
+    
+    doLast {
+        configurations.runtimeClasspath.each { file ->
+            if (file.name.endsWith('.jar') && !file.name.contains('-sources')) {
+                println "\n=== ${file.name} ==="
+                try {
+                    def jarFile = new java.util.jar.JarFile(file)
+                    jarFile.entries()
+                        .findAll { it.name.endsWith('.class') }
+                        .collect { it.name.replace('/', '.').replace('.class', '') }
+                        .sort()
+                        .each { println it }
+                    jarFile.close()
+                } catch (Exception e) {
+                    println "无法读取JAR: ${e.message}"
+                }
+            }
+        }
+    }
 }
