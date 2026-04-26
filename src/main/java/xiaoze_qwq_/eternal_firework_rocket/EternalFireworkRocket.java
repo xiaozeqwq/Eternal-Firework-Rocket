@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +18,7 @@ import xiaoze_qwq_.eternal_firework_rocket.entity.InvisibleFireworkRocketEntity;
 import xiaoze_qwq_.eternal_firework_rocket.entity.UltimateFireworkRocketEntity;
 import xiaoze_qwq_.eternal_firework_rocket.item.UltimateFireworkRocketItem;
 import xiaoze_qwq_.eternal_firework_rocket.loot.ModLootTableModifier;
+import xiaoze_qwq_.eternal_firework_rocket.util.PlayerConversionTracker;
 
 public class EternalFireworkRocket implements ModInitializer {
     public static final String MOD_ID = "eternal-firework-rocket";
@@ -65,15 +67,24 @@ public class EternalFireworkRocket implements ModInitializer {
         ModConfig.loadConfig();
         ModLootTableModifier.registerLootTableModifications();
 
-        // 三级火箭 → 终极火箭 转换（飞行中 Y ≥ 114514）
+        // 三级火箭 → 终极火箭 转换（每人仅一次）
         ServerTickEvents.END_SERVER_TICK.register(server -> {
+            // 确保持久化目录已初始化（使用当前 server 的世界路径）
+            PlayerConversionTracker.init(server);
+
             for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
                 if (player.isFallFlying()) {
                     ItemStack stack = player.getMainHandStack();
                     if (stack.getItem() == ETERNAL_FIREWORK_ROCKET_3 && player.getY() >= 114514.0) {
-                        ItemStack newStack = new ItemStack(ULTIMATE_FIREWORK_ROCKET_ITEM);
-                        player.getInventory().setStack(player.getInventory().selectedSlot, newStack);
-                        player.sendMessage(net.minecraft.text.Text.literal("§d你的三级永恒烟花火箭进化成了终极永恒烟花火箭！"), true);
+                        // 检查是否已经转化过
+                        if (!PlayerConversionTracker.hasConverted(player)) {
+                            // 替换为终极火箭
+                            ItemStack newStack = new ItemStack(ULTIMATE_FIREWORK_ROCKET_ITEM);
+                            player.getInventory().setStack(player.getInventory().selectedSlot, newStack);
+                            // 标记已转化
+                            PlayerConversionTracker.setConverted(player, true);
+                            player.sendMessage(Text.translatable("message.eternal-firework-rocket.evolution"), true);
+                        }
                     }
                 }
             }

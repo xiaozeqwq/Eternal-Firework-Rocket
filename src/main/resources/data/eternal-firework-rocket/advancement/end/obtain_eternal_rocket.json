@@ -12,8 +12,9 @@
     "frame": "challenge",
     "show_toast": true,
     "announce_to_chat": true,
-    "hidden": false
+    "hidden": true
   },
+  "parent": "minecraft:adventure/sky_is_the_limit",
   "criteria": {
     "has_rocket": {
       "trigger": "minecraft:inventory_changed",

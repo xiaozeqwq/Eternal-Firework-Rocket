@@ -93,3 +93,26 @@ publishing {
 		// retrieving dependencies.
 	}
 }
+
+task listAllDependencyClasses {
+    notCompatibleWithConfigurationCache()
+    
+    doLast {
+        configurations.runtimeClasspath.each { file ->
+            if (file.name.endsWith('.jar') && !file.name.contains('-sources')) {
+                println "\n=== ${file.name} ==="
+                try {
+                    def jarFile = new java.util.jar.JarFile(file)
+                    jarFile.entries()
+                        .findAll { it.name.endsWith('.class') }
+                        .collect { it.name.replace('/', '.').replace('.class', '') }
+                        .sort()
+                        .each { println it }
+                    jarFile.close()
+                } catch (Exception e) {
+                    println "无法读取JAR: ${e.message}"
+                }
+            }
+        }
+    }
+}

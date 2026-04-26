@@ -6,5 +6,6 @@
   "advancement.eternal-firework-rocket.obtain_eternal_rocket.title": "无限的烟花火箭？",
   "advancement.eternal-firework-rocket.obtain_eternal_rocket.description": "获得一个任意等级的永恒烟花火箭",
   "advancement.eternal-firework-rocket.use_ultimate_rocket.title": "超音速巡航",
-  "advancement.eternal-firework-rocket.use_ultimate_rocket.description": "使用终极永恒烟花火箭飞行"
+  "advancement.eternal-firework-rocket.use_ultimate_rocket.description": "使用终极永恒烟花火箭飞行",
+  "message.eternal-firework-rocket.evolution": "§d你的三级永恒烟花火箭进化成了终极永恒烟花火箭！"
 }

@@ -13,14 +13,13 @@ import xiaoze_qwq_.eternal_firework_rocket.EternalFireworkRocket;
 import xiaoze_qwq_.eternal_firework_rocket.entity.UltimateFireworkRocketEntity;
 
 public class UltimateFireworkRocketItem extends Item {
-
     public UltimateFireworkRocketItem(Settings settings) {
         super(settings);
     }
 
     @Override
     public boolean hasGlint(ItemStack stack) {
-        return true; // 附魔光效
+        return true;
     }
 
     @Override
@@ -32,11 +31,13 @@ public class UltimateFireworkRocketItem extends Item {
         }
 
         if (!world.isClient) {
+            // 设置冷却 5 秒（与原 rocket 持续时间一致，防止叠加）
+            user.getItemCooldownManager().set(this, 100);
+
             UltimateFireworkRocketEntity rocket = new UltimateFireworkRocketEntity(
                     EternalFireworkRocket.ULTIMATE_FIREWORK_ROCKET,
                     world,
-                    user,
-                    hand
+                    user
             );
             world.spawnEntity(rocket);
 
@@ -46,7 +47,6 @@ public class UltimateFireworkRocketItem extends Item {
             user.incrementStat(Stats.USED.getOrCreateStat(this));
         }
 
-        user.setCurrentHand(hand);
         return TypedActionResult.success(stack, world.isClient());
     }
 }
