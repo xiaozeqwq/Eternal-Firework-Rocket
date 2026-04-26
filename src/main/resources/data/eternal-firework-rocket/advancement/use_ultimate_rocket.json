@@ -14,6 +14,7 @@
     "announce_to_chat": true,
     "hidden": true
   },
+  "parent": "eternal-firework-rocket:obtain_eternal_rocket",
   "criteria": {
     "has_ultimate": {
       "trigger": "minecraft:inventory_changed",

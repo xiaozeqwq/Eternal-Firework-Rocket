@@ -3,9 +3,10 @@ package xiaoze_qwq_.eternal_firework_rocket.util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.world.level.storage.LevelResource;
+import net.minecraft.util.WorldSavePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,16 +27,12 @@ public class PlayerConversionTracker {
         return player.getName().getString() + "," + player.getUuidAsString();
     }
 
+    // 在服务器启动时调用
     public static void init(MinecraftServer server) {
-        if (dataFile != null) return; // 已初始化
+        if (dataFile != null) return;
 
-        // 获取存储目录：专用服务器 -> server 目录，单人 -> 世界目录
-        Path basePath;
-        if (server.isDedicated()) {
-            basePath = server.getRunDirectory().toPath();
-        } else {
-            basePath = server.getSavePath(LevelResource.ROOT);
-        }
+        // 获取世界根目录
+        Path basePath = server.getSavePath(WorldSavePath.ROOT);
         Path modFolder = basePath.resolve("eternal_firework_rocket");
         try {
             Files.createDirectories(modFolder);
@@ -44,7 +41,29 @@ public class PlayerConversionTracker {
         }
         dataFile = modFolder.resolve("conversion.json").toFile();
 
+        // 加载现有数据，如果文件不存在则创建空文件
         load();
+        if (!dataFile.exists()) {
+            save(); // 创建空 json 文件
+        }
+
+        // 注册玩家登录事件，自动添加条目（false）
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server1) -> {
+            ServerPlayerEntity player = handler.getPlayer();
+            registerPlayer(player);
+        });
+
+        LOGGER.info("Conversion tracker initialized, file: " + dataFile.getAbsolutePath());
+    }
+
+    // 玩家登录时调用，若不存在则添加 false
+    public static void registerPlayer(ServerPlayerEntity player) {
+        String key = getPlayerKey(player);
+        if (!conversionMap.containsKey(key)) {
+            conversionMap.put(key, false);
+            save();
+            LOGGER.debug("Registered player {} with conversion=false", key);
+        }
     }
 
     private static void load() {
