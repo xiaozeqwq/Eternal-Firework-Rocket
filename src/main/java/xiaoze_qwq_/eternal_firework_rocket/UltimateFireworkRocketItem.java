@@ -31,9 +31,7 @@ public class UltimateFireworkRocketItem extends Item {
         }
 
         if (!world.isClient) {
-            // 设置冷却 5 秒（与原 rocket 持续时间一致，防止叠加）
-            user.getItemCooldownManager().set(this, 100);
-
+            // 无冷却，直接生成火箭实体
             UltimateFireworkRocketEntity rocket = new UltimateFireworkRocketEntity(
                     EternalFireworkRocket.ULTIMATE_FIREWORK_ROCKET,
                     world,

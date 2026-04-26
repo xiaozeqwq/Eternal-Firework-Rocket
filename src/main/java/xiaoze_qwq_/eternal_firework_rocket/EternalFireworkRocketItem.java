@@ -3,6 +3,7 @@ package xiaoze_qwq_.eternal_firework_rocket;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
@@ -59,6 +60,15 @@ public class EternalFireworkRocketItem extends Item {
                     SoundEvents.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 3.0F, 1.0F);
 
             user.incrementStat(Stats.USED.getOrCreateStat(this));
+
+            // 粒子效果：生成烟花粒子
+            for (int i = 0; i < 10; i++) {
+                world.addParticle(ParticleTypes.FIREWORK,
+                        user.getX() + (world.random.nextDouble() - 0.5) * 0.5,
+                        user.getY() + world.random.nextDouble() * 1.0,
+                        user.getZ() + (world.random.nextDouble() - 0.5) * 0.5,
+                        0, 0, 0);
+            }
         }
 
         return TypedActionResult.success(stack, world.isClient());

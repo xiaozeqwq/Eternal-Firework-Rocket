@@ -14,7 +14,7 @@
     "announce_to_chat": true,
     "hidden": true
   },
-  "parent": "minecraft:adventure/sky_is_the_limit",
+  "parent": "minecraft:end/elytra",
   "criteria": {
     "has_rocket": {
       "trigger": "minecraft:inventory_changed",

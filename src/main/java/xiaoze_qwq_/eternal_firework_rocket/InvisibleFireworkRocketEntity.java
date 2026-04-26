@@ -6,6 +6,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -61,6 +62,16 @@ public class InvisibleFireworkRocketEntity extends Entity {
         Vec3d handOffset = shooter.getHandPosOffset(Items.FIREWORK_ROCKET);
         this.setPosition(shooter.getX() + handOffset.x, shooter.getY() + handOffset.y, shooter.getZ() + handOffset.z);
         this.setVelocity(shooter.getVelocity());
+
+        // 粒子效果：每 tick 生成一个烟花粒子（服务端自动同步到客户端）
+        if (!getWorld().isClient) {
+            Vec3d pos = shooter.getPos();
+            getWorld().addParticle(ParticleTypes.FIREWORK,
+                    pos.x + (random.nextDouble() - 0.5) * 0.6,
+                    pos.y + random.nextDouble() * 1.2,
+                    pos.z + (random.nextDouble() - 0.5) * 0.6,
+                    0, 0, 0);
+        }
 
         if (life > lifeTime) {
             this.discard();
