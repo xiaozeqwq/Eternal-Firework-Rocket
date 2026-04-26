@@ -14,8 +14,10 @@ public class UltimateFireworkRocketEntity extends Entity {
     private int life;
     private final int lifeTime = 100;  // 5秒
 
-    private static final double TARGET_SPEED = 510.0;  // 格/秒
-    private static final double SPEED_PER_TICK = TARGET_SPEED / 20.0;  // 25.5 格/tick
+    // 推力参数：达到 25.5 格/tick (510格/秒) 的目标速度
+    // 公式 v_new = 0.5*v + d*u，d = 目标速度 * (1-0.5) = 12.75
+    private static final double DAMPING = 0.5;           // 阻尼系数
+    private static final double FORCE = 12.75;           // 推力系数（u方向直接增加的量）
 
     public UltimateFireworkRocketEntity(EntityType<?> type, World world) {
         super(type, world);
@@ -48,15 +50,17 @@ public class UltimateFireworkRocketEntity extends Entity {
             return;
         }
 
-        // 设置速度为目标方向 * 超音速
-        Vec3d lookVec = shooter.getRotationVector();
-        Vec3d targetVelocity = lookVec.multiply(SPEED_PER_TICK);
-        shooter.setVelocity(targetVelocity);
+        // 递推动量更新（与原版烟花火箭一致，但强很多）
+        Vec3d vel = shooter.getVelocity();
+        Vec3d look = shooter.getRotationVector();
+        double newVelX = vel.x * DAMPING + look.x * FORCE;
+        double newVelY = vel.y * DAMPING + look.y * FORCE;
+        double newVelZ = vel.z * DAMPING + look.z * FORCE;
+        shooter.setVelocity(newVelX, newVelY, newVelZ);
         shooter.velocityModified = true;
 
-        // 粒子效果（火焰 + 烟雾）
+        // 粒子效果（客户端）
         if (getWorld().isClient) {
-            // 客户端生成粒子
             Vec3d pos = shooter.getPos();
             for (int i = 0; i < 5; i++) {
                 getWorld().addParticle(ParticleTypes.FLAME,
@@ -72,7 +76,7 @@ public class UltimateFireworkRocketEntity extends Entity {
             }
         }
 
-        // 跟随玩家手持位置（实体不可见，仅用于位置同步）
+        // 跟随玩家手持位置（视觉占位）
         Vec3d handOffset = shooter.getHandPosOffset(net.minecraft.item.Items.FIREWORK_ROCKET);
         this.setPosition(shooter.getX() + handOffset.x, shooter.getY() + handOffset.y, shooter.getZ() + handOffset.z);
         this.setVelocity(shooter.getVelocity());

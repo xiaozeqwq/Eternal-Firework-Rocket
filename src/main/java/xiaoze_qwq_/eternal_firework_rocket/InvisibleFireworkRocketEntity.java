@@ -63,8 +63,8 @@ public class InvisibleFireworkRocketEntity extends Entity {
         this.setPosition(shooter.getX() + handOffset.x, shooter.getY() + handOffset.y, shooter.getZ() + handOffset.z);
         this.setVelocity(shooter.getVelocity());
 
-        // 粒子效果：每 tick 生成一个烟花粒子（服务端自动同步到客户端）
-        if (!getWorld().isClient) {
+        // 粒子效果：在客户端生成（确保可见）
+        if (getWorld().isClient) {
             Vec3d pos = shooter.getPos();
             getWorld().addParticle(ParticleTypes.FIREWORK,
                     pos.x + (random.nextDouble() - 0.5) * 0.6,
