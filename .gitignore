@@ -32,6 +32,10 @@ bin/
 
 run/
 
+# accidental dumps
+classes.txt
+
+
 # java
 
 hs_err_*.log

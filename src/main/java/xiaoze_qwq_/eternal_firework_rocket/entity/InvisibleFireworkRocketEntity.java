@@ -5,10 +5,16 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+
+//? if >=1.21.6 {
+import net.minecraft.storage.ReadView;
+import net.minecraft.storage.WriteView;
+//?} else {
+/*import net.minecraft.nbt.NbtCompound;
+*///?}
 
 public class InvisibleFireworkRocketEntity extends Entity {
     private LivingEntity shooter;
@@ -29,8 +35,13 @@ public class InvisibleFireworkRocketEntity extends Entity {
         this.setPosition(shooter.getX(), shooter.getY(), shooter.getZ());
     }
 
+    //? if >=1.20.5 {
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {}
+    //?} else {
+    /*@Override
+    protected void initDataTracker() {}
+    *///?}
 
     @Override
     public void tick() {
@@ -41,7 +52,11 @@ public class InvisibleFireworkRocketEntity extends Entity {
             return;
         }
 
-        if (!shooter.isFallFlying()) {
+        //? if >=1.21.2 {
+        if (!shooter.isGliding()) {
+        //?} else {
+        /*if (!shooter.isFallFlying()) {
+        *///?}
             this.discard();
             return;
         }
@@ -63,14 +78,21 @@ public class InvisibleFireworkRocketEntity extends Entity {
         this.setPosition(shooter.getX() + handOffset.x, shooter.getY() + handOffset.y, shooter.getZ() + handOffset.z);
         this.setVelocity(shooter.getVelocity());
 
-        // 粒子效果：在客户端生成（确保可见）
-        if (getWorld().isClient) {
+        if (getEntityWorld().isClient) {
             Vec3d pos = shooter.getPos();
-            getWorld().addParticle(ParticleTypes.FIREWORK,
+            //? if >=1.21.5 {
+            getEntityWorld().addParticleClient(ParticleTypes.FIREWORK,
                     pos.x + (random.nextDouble() - 0.5) * 0.6,
                     pos.y + random.nextDouble() * 1.2,
                     pos.z + (random.nextDouble() - 0.5) * 0.6,
                     0, 0, 0);
+            //?} else {
+            /*getEntityWorld().addParticle(ParticleTypes.FIREWORK,
+                    pos.x + (random.nextDouble() - 0.5) * 0.6,
+                    pos.y + random.nextDouble() * 1.2,
+                    pos.z + (random.nextDouble() - 0.5) * 0.6,
+                    0, 0, 0);
+            *///?}
         }
 
         if (life > lifeTime) {
@@ -78,11 +100,19 @@ public class InvisibleFireworkRocketEntity extends Entity {
         }
     }
 
+    //? if >=1.21.6 {
     @Override
+    protected void readCustomData(ReadView view) {}
+
+    @Override
+    protected void writeCustomData(WriteView view) {}
+    //?} else {
+    /*@Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {}
 
     @Override
     protected void writeCustomDataToNbt(NbtCompound nbt) {}
+    *///?}
 
     @Override
     public boolean shouldRender(double cameraX, double cameraY, double cameraZ) {

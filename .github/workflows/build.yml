@@ -1,14 +1,35 @@
-# Automatically build the project and run any configured tests for every push
-# and submitted pull request. This can help catch issues that only occur on
-# certain platforms or Java versions, and provides a first line of defence
-# against bad commits.
-
 name: build
-on: [pull_request, push]
+
+on:
+  workflow_dispatch:
 
 jobs:
   build:
+    name: ${{ matrix.mc }}
     runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        mc:
+          - "1.20.1"
+          - "1.20.2"
+          - "1.20.3"
+          - "1.20.4"
+          - "1.20.5"
+          - "1.20.6"
+          - "1.21"
+          - "1.21.1"
+          - "1.21.2"
+          - "1.21.3"
+          - "1.21.4"
+          - "1.21.5"
+          - "1.21.6"
+          - "1.21.7"
+          - "1.21.8"
+          - "1.21.9"
+          - "1.21.10"
+          - "1.21.11"
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
@@ -18,13 +39,22 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: '21'
-          distribution: 'microsoft'
+          distribution: 'temurin'
+      - name: setup gradle
+        uses: gradle/actions/setup-gradle@v4
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
-      - name: build
-        run: ./gradlew build
+      - name: select stonecutter version
+        run: sed -i 's/stonecutter active ".*"/stonecutter active "${{ matrix.mc }}"/' stonecutter.gradle.kts
+      - name: build Minecraft ${{ matrix.mc }}
+        env:
+          SC_VERSION: ${{ matrix.mc }}
+          GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
+        run: ./gradlew :${{ matrix.mc }}:build --stacktrace --no-daemon
       - name: capture build artifacts
+        if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: Artifacts
-          path: build/libs/
+          name: eternal-firework-rocket-${{ matrix.mc }}
+          path: versions/${{ matrix.mc }}/build/libs/
+          if-no-files-found: error
