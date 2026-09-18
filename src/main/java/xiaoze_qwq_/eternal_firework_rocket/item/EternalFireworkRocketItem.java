@@ -34,7 +34,7 @@ public class EternalFireworkRocketItem extends Item {
     *///?}
         ItemStack stack = user.getStackInHand(hand);
 
-        if (!world.isClient && ModConfig.CONFIG.adminOnly && user instanceof ServerPlayerEntity serverPlayer) {
+        if (!world.isClient() && ModConfig.CONFIG.adminOnly && user instanceof ServerPlayerEntity serverPlayer) {
             if (!serverPlayer.hasPermissionLevel(2)) {
                 //? if >=1.21.2 {
                 return ActionResult.FAIL;
@@ -54,7 +54,7 @@ public class EternalFireworkRocketItem extends Item {
         }
         *///?}
 
-        if (!world.isClient) {
+        if (!world.isClient()) {
             int flightDuration;
             if (stack.isOf(EternalFireworkRocket.ETERNAL_FIREWORK_ROCKET_3)) {
                 flightDuration = 3;

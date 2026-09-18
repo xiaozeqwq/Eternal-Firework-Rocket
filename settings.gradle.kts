@@ -24,9 +24,14 @@ stonecutter {
             "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10", "1.21.11"
         )
         val ciVersion = System.getenv("SC_VERSION")
-        val versions = if (!ciVersion.isNullOrBlank()) listOf(ciVersion) else allVersions
+        val active = "1.21.11"
+        val versions = when {
+            ciVersion.isNullOrBlank() -> allVersions
+            ciVersion == active -> listOf(active)
+            else -> listOf(active, ciVersion)
+        }
         versions.forEach { version(it, it) }
-        vcsVersion = ciVersion ?: "1.21.1"
+        vcsVersion = active
     }
 }
 

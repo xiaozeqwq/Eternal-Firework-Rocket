@@ -44,8 +44,6 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
-      - name: select stonecutter version
-        run: sed -i 's/stonecutter active ".*"/stonecutter active "${{ matrix.mc }}"/' stonecutter.gradle.kts
       - name: build Minecraft ${{ matrix.mc }}
         env:
           SC_VERSION: ${{ matrix.mc }}

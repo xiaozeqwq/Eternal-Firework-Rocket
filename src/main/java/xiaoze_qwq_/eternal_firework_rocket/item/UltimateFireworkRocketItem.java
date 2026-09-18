@@ -45,7 +45,7 @@ public class UltimateFireworkRocketItem extends Item {
         }
         *///?}
 
-        if (!world.isClient) {
+        if (!world.isClient()) {
             UltimateFireworkRocketEntity rocket = new UltimateFireworkRocketEntity(
                     EternalFireworkRocket.ULTIMATE_FIREWORK_ROCKET,
                     world,

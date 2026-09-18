@@ -41,16 +41,24 @@ public class EternalFireworkRocket implements ModInitializer {
     public static final Item ETERNAL_FIREWORK_ROCKET_3 = new EternalFireworkRocketItem(itemSettings("eternal_firework_rocket_3").maxCount(1));
     public static final Item ULTIMATE_FIREWORK_ROCKET_ITEM = new UltimateFireworkRocketItem(itemSettings("eternal_firework_rocket_ultimate").maxCount(1).fireproof());
 
+    private static Identifier id(String path) {
+        //? if >=1.21 {
+        return Identifier.of(MOD_ID, path);
+        //?} else {
+        /*return new Identifier(MOD_ID, path);
+        *///?}
+    }
+
     private static Item.Settings itemSettings(String path) {
         Item.Settings settings = new Item.Settings();
         //? if >=1.21.2 {
-        settings.registryKey(RegistryKey.of(RegistryKeys.ITEM, Identifier.of(MOD_ID, path)));
+        settings.registryKey(RegistryKey.of(RegistryKeys.ITEM, id(path)));
         //?}
         return settings;
     }
 
     private static EntityType<InvisibleFireworkRocketEntity> registerInvisibleFireworkRocket() {
-        Identifier id = Identifier.of(MOD_ID, "invisible_firework_rocket");
+        Identifier id = id("invisible_firework_rocket");
         EntityType.Builder<InvisibleFireworkRocketEntity> builder = EntityType.Builder
                 .<InvisibleFireworkRocketEntity>create(InvisibleFireworkRocketEntity::new, SpawnGroup.MISC)
                 //? if >=1.20.5 {
@@ -69,7 +77,7 @@ public class EternalFireworkRocket implements ModInitializer {
     }
 
     private static EntityType<UltimateFireworkRocketEntity> registerUltimateFireworkRocket() {
-        Identifier id = Identifier.of(MOD_ID, "ultimate_firework_rocket");
+        Identifier id = id("ultimate_firework_rocket");
         EntityType.Builder<UltimateFireworkRocketEntity> builder = EntityType.Builder
                 .<UltimateFireworkRocketEntity>create(UltimateFireworkRocketEntity::new, SpawnGroup.MISC)
                 //? if >=1.20.5 {
@@ -91,10 +99,10 @@ public class EternalFireworkRocket implements ModInitializer {
     public void onInitialize() {
         LOGGER.info("Eternal Firework Rocket Mod Initializing...");
 
-        Registry.register(Registries.ITEM, Identifier.of(MOD_ID, "eternal_firework_rocket_1"), ETERNAL_FIREWORK_ROCKET_1);
-        Registry.register(Registries.ITEM, Identifier.of(MOD_ID, "eternal_firework_rocket_2"), ETERNAL_FIREWORK_ROCKET_2);
-        Registry.register(Registries.ITEM, Identifier.of(MOD_ID, "eternal_firework_rocket_3"), ETERNAL_FIREWORK_ROCKET_3);
-        Registry.register(Registries.ITEM, Identifier.of(MOD_ID, "eternal_firework_rocket_ultimate"), ULTIMATE_FIREWORK_ROCKET_ITEM);
+        Registry.register(Registries.ITEM, id("eternal_firework_rocket_1"), ETERNAL_FIREWORK_ROCKET_1);
+        Registry.register(Registries.ITEM, id("eternal_firework_rocket_2"), ETERNAL_FIREWORK_ROCKET_2);
+        Registry.register(Registries.ITEM, id("eternal_firework_rocket_3"), ETERNAL_FIREWORK_ROCKET_3);
+        Registry.register(Registries.ITEM, id("eternal_firework_rocket_ultimate"), ULTIMATE_FIREWORK_ROCKET_ITEM);
 
         ModConfig.loadConfig();
         ModLootTableModifier.registerLootTableModifications();

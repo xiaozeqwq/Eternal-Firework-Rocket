@@ -10,6 +10,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 //? if >=1.21.6 {
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 //?} else {
@@ -78,16 +80,22 @@ public class InvisibleFireworkRocketEntity extends Entity {
         this.setPosition(shooter.getX() + handOffset.x, shooter.getY() + handOffset.y, shooter.getZ() + handOffset.z);
         this.setVelocity(shooter.getVelocity());
 
-        if (getEntityWorld().isClient) {
-            Vec3d pos = shooter.getPos();
+        //? if >=1.21.9 {
+        World entityWorld = getEntityWorld();
+        Vec3d pos = shooter.getEntityPos();
+        //?} else {
+        /*World entityWorld = getWorld();
+        Vec3d pos = shooter.getPos();
+        *///?}
+        if (entityWorld.isClient()) {
             //? if >=1.21.5 {
-            getEntityWorld().addParticleClient(ParticleTypes.FIREWORK,
+            entityWorld.addParticleClient(ParticleTypes.FIREWORK,
                     pos.x + (random.nextDouble() - 0.5) * 0.6,
                     pos.y + random.nextDouble() * 1.2,
                     pos.z + (random.nextDouble() - 0.5) * 0.6,
                     0, 0, 0);
             //?} else {
-            /*getEntityWorld().addParticle(ParticleTypes.FIREWORK,
+            /*entityWorld.addParticle(ParticleTypes.FIREWORK,
                     pos.x + (random.nextDouble() - 0.5) * 0.6,
                     pos.y + random.nextDouble() * 1.2,
                     pos.z + (random.nextDouble() - 0.5) * 0.6,
@@ -106,6 +114,11 @@ public class InvisibleFireworkRocketEntity extends Entity {
 
     @Override
     protected void writeCustomData(WriteView view) {}
+
+    @Override
+    public boolean damage(ServerWorld world, DamageSource source, float amount) {
+        return false;
+    }
     //?} else {
     /*@Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {}

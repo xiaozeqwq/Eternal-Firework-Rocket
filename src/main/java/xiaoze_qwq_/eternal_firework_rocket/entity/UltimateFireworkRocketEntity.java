@@ -10,6 +10,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 //? if >=1.21.6 {
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 //?} else {
@@ -72,27 +74,33 @@ public class UltimateFireworkRocketEntity extends Entity {
         shooter.setVelocity(newVelX, newVelY, newVelZ);
         shooter.velocityModified = true;
 
-        if (getEntityWorld().isClient) {
-            Vec3d pos = shooter.getPos();
+        //? if >=1.21.9 {
+        World entityWorld = getEntityWorld();
+        Vec3d pos = shooter.getEntityPos();
+        //?} else {
+        /*World entityWorld = getWorld();
+        Vec3d pos = shooter.getPos();
+        *///?}
+        if (entityWorld.isClient()) {
             for (int i = 0; i < 5; i++) {
                 //? if >=1.21.5 {
-                getEntityWorld().addParticleClient(ParticleTypes.FLAME,
+                entityWorld.addParticleClient(ParticleTypes.FLAME,
                         pos.x + (random.nextDouble() - 0.5) * 1.0,
                         pos.y + random.nextDouble() * 1.5,
                         pos.z + (random.nextDouble() - 0.5) * 1.0,
                         0, 0, 0);
-                getEntityWorld().addParticleClient(ParticleTypes.LARGE_SMOKE,
+                entityWorld.addParticleClient(ParticleTypes.LARGE_SMOKE,
                         pos.x + (random.nextDouble() - 0.5) * 1.0,
                         pos.y + random.nextDouble() * 1.5,
                         pos.z + (random.nextDouble() - 0.5) * 1.0,
                         0, 0, 0);
                 //?} else {
-                /*getEntityWorld().addParticle(ParticleTypes.FLAME,
+                /*entityWorld.addParticle(ParticleTypes.FLAME,
                         pos.x + (random.nextDouble() - 0.5) * 1.0,
                         pos.y + random.nextDouble() * 1.5,
                         pos.z + (random.nextDouble() - 0.5) * 1.0,
                         0, 0, 0);
-                getEntityWorld().addParticle(ParticleTypes.LARGE_SMOKE,
+                entityWorld.addParticle(ParticleTypes.LARGE_SMOKE,
                         pos.x + (random.nextDouble() - 0.5) * 1.0,
                         pos.y + random.nextDouble() * 1.5,
                         pos.z + (random.nextDouble() - 0.5) * 1.0,
@@ -112,6 +120,11 @@ public class UltimateFireworkRocketEntity extends Entity {
 
     @Override
     protected void writeCustomData(WriteView view) {}
+
+    @Override
+    public boolean damage(ServerWorld world, DamageSource source, float amount) {
+        return false;
+    }
     //?} else {
     /*@Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {}

@@ -5,7 +5,6 @@ import net.minecraft.loot.LootTable;
 import net.minecraft.loot.condition.RandomChanceLootCondition;
 import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
-import net.minecraft.util.Identifier;
 import xiaoze_qwq_.eternal_firework_rocket.EternalFireworkRocket;
 import xiaoze_qwq_.eternal_firework_rocket.config.ModConfig;
 
@@ -13,6 +12,7 @@ import xiaoze_qwq_.eternal_firework_rocket.config.ModConfig;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 //?} else {
 /*import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
+import net.minecraft.util.Identifier;
 *///?}
 
 public class ModLootTableModifier {
@@ -25,7 +25,7 @@ public class ModLootTableModifier {
         });
         //?} else if >=1.20.5 {
         /*LootTableEvents.MODIFY.register((key, builder, source) -> {
-            if (key.getValue().equals(Identifier.of("minecraft", "chests/end_city_treasure"))) {
+            if (key.getValue().equals(new Identifier("minecraft", "chests/end_city_treasure"))) {
                 addPools(builder);
             }
         });
