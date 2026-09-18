@@ -9,9 +9,11 @@ import net.minecraft.particle.ParticleTypes;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-//? if >=1.21.6 {
+//? if >=1.21.2 {
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.world.ServerWorld;
+//?}
+//? if >=1.21.6 {
 import net.minecraft.storage.ReadView;
 import net.minecraft.storage.WriteView;
 //?} else {
@@ -74,7 +76,11 @@ public class InvisibleFireworkRocketEntity extends Entity {
                 rotation.z * 0.1 + (rotation.z * 1.5 - velocity.z) * 0.5
             )
         );
-        shooter.velocityModified = true;
+        //? if >=1.21.11 {
+        shooter.knockedBack = true;
+        //?} else {
+        /*shooter.velocityModified = true;
+        *///?}
 
         Vec3d handOffset = shooter.getHandPosOffset(Items.FIREWORK_ROCKET);
         this.setPosition(shooter.getX() + handOffset.x, shooter.getY() + handOffset.y, shooter.getZ() + handOffset.z);
@@ -114,11 +120,6 @@ public class InvisibleFireworkRocketEntity extends Entity {
 
     @Override
     protected void writeCustomData(WriteView view) {}
-
-    @Override
-    public boolean damage(ServerWorld world, DamageSource source, float amount) {
-        return false;
-    }
     //?} else {
     /*@Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {}
@@ -126,6 +127,13 @@ public class InvisibleFireworkRocketEntity extends Entity {
     @Override
     protected void writeCustomDataToNbt(NbtCompound nbt) {}
     *///?}
+
+    //? if >=1.21.2 {
+    @Override
+    public boolean damage(ServerWorld world, DamageSource source, float amount) {
+        return false;
+    }
+    //?}
 
     @Override
     public boolean shouldRender(double cameraX, double cameraY, double cameraZ) {

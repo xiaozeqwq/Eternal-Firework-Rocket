@@ -19,6 +19,10 @@ import net.minecraft.util.ActionResult;
 //?} else {
 /*import net.minecraft.util.TypedActionResult;
 *///?}
+//? if >=1.21.11 {
+import net.minecraft.command.permission.Permission;
+import net.minecraft.command.permission.PermissionLevel;
+//?}
 
 public class EternalFireworkRocketItem extends Item {
 
@@ -35,7 +39,11 @@ public class EternalFireworkRocketItem extends Item {
         ItemStack stack = user.getStackInHand(hand);
 
         if (!world.isClient() && ModConfig.CONFIG.adminOnly && user instanceof ServerPlayerEntity serverPlayer) {
-            if (!serverPlayer.hasPermissionLevel(2)) {
+            //? if >=1.21.11 {
+            if (!serverPlayer.getPermissions().hasPermission(new Permission.Level(PermissionLevel.GAMEMASTERS))) {
+            //?} else {
+            /*if (!serverPlayer.hasPermissionLevel(2)) {
+            *///?}
                 //? if >=1.21.2 {
                 return ActionResult.FAIL;
                 //?} else {
