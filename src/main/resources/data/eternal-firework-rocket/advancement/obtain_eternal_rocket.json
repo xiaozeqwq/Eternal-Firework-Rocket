@@ -1,8 +1,8 @@
 {
   "display": {
     "icon": {
-      "item": "eternal-firework-rocket:eternal_firework_rocket_1",
-      "id": "eternal-firework-rocket:eternal_firework_rocket_1"
+      "item": "eternal-firework-rocket:eternal_firework_rocket",
+      "id": "eternal-firework-rocket:eternal_firework_rocket"
     },
     "title": {
       "translate": "advancement.eternal-firework-rocket.obtain_eternal_rocket.title"
@@ -23,9 +23,7 @@
         "items": [
           {
             "items": [
-              "eternal-firework-rocket:eternal_firework_rocket_1",
-              "eternal-firework-rocket:eternal_firework_rocket_2",
-              "eternal-firework-rocket:eternal_firework_rocket_3"
+              "eternal-firework-rocket:eternal_firework_rocket"
             ]
           }
         ]

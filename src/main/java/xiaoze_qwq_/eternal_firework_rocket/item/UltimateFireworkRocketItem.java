@@ -10,6 +10,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import xiaoze_qwq_.eternal_firework_rocket.EternalFireworkRocket;
 import xiaoze_qwq_.eternal_firework_rocket.entity.UltimateFireworkRocketEntity;
+import xiaoze_qwq_.eternal_firework_rocket.util.PermissionHelper;
 
 //? if >=1.21.2 {
 import net.minecraft.util.ActionResult;
@@ -34,6 +35,14 @@ public class UltimateFireworkRocketItem extends Item {
     /*public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
     *///?}
         ItemStack stack = user.getStackInHand(hand);
+
+        if (!world.isClient() && !PermissionHelper.hasUsePermission(user)) {
+            //? if >=1.21.2 {
+            return ActionResult.FAIL;
+            //?} else {
+            /*return TypedActionResult.fail(stack);
+            *///?}
+        }
 
         //? if >=1.21.2 {
         if (!user.isGliding()) {

@@ -7,6 +7,14 @@ import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
 import xiaoze_qwq_.eternal_firework_rocket.EternalFireworkRocket;
 import xiaoze_qwq_.eternal_firework_rocket.config.ModConfig;
+import xiaoze_qwq_.eternal_firework_rocket.util.FireworkData;
+
+//? if >=1.20.5 {
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.loot.function.SetComponentsLootFunction;
+//?} else {
+/*import net.minecraft.loot.function.SetNbtLootFunction;
+*///?}
 
 //? if >=1.21 {
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
@@ -40,22 +48,28 @@ public class ModLootTableModifier {
 
     private static void addPools(LootTable.Builder builder) {
         if (ModConfig.CONFIG.chanceFlight1 > 0) {
-            builder.pool(makePool(EternalFireworkRocket.ETERNAL_FIREWORK_ROCKET_1, ModConfig.CONFIG.chanceFlight1));
+            builder.pool(makePool(1, ModConfig.CONFIG.chanceFlight1));
         }
 
         if (ModConfig.CONFIG.chanceFlight2 > 0) {
-            builder.pool(makePool(EternalFireworkRocket.ETERNAL_FIREWORK_ROCKET_2, ModConfig.CONFIG.chanceFlight2));
+            builder.pool(makePool(2, ModConfig.CONFIG.chanceFlight2));
         }
 
         if (ModConfig.CONFIG.chanceFlight3 > 0) {
-            builder.pool(makePool(EternalFireworkRocket.ETERNAL_FIREWORK_ROCKET_3, ModConfig.CONFIG.chanceFlight3));
+            builder.pool(makePool(3, ModConfig.CONFIG.chanceFlight3));
         }
     }
 
-    private static LootPool.Builder makePool(net.minecraft.item.Item item, double chancePercent) {
-        return LootPool.builder()
+    private static LootPool.Builder makePool(int flight, double chancePercent) {
+        LootPool.Builder pool = LootPool.builder()
                 .rolls(ConstantLootNumberProvider.create(1))
-                .with(ItemEntry.builder(item))
+                .with(ItemEntry.builder(EternalFireworkRocket.ETERNAL_FIREWORK_ROCKET))
                 .conditionally(RandomChanceLootCondition.builder((float) (chancePercent / 100.0)));
+        //? if >=1.20.5 {
+        return pool.apply(SetComponentsLootFunction.builder(
+                DataComponentTypes.FIREWORKS, FireworkData.createComponent(flight)));
+        //?} else {
+        /*return pool.apply(SetNbtLootFunction.builder(FireworkData.createNbt(flight)));
+        *///?}
     }
 }

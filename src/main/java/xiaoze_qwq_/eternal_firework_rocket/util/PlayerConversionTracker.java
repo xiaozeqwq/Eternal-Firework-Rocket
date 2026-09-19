@@ -20,18 +20,24 @@ import java.util.concurrent.ConcurrentHashMap;
 public class PlayerConversionTracker {
     private static final Logger LOGGER = LoggerFactory.getLogger("EternalFireworkRocket/Conversion");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+
+    /** Flush dirty data at most once every 30 seconds (20 ticks * 30). */
+    private static final int SAVE_INTERVAL_TICKS = 600;
+
     private static File dataFile;
     private static final Map<String, Boolean> conversionMap = new ConcurrentHashMap<>();
+    private static boolean dirty = false;
+    private static int ticksSinceSave = 0;
 
-    private static String getPlayerKey(ServerPlayerEntity player) {
-        return player.getName().getString() + "," + player.getUuidAsString();
+    private PlayerConversionTracker() {}
+
+    /** Registers world-independent events. Call once during mod initialization. */
+    public static void registerEvents() {
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> registerPlayer(handler.getPlayer()));
     }
 
-    // 在服务器启动时调用
+    /** Called when the server finished loading a world. */
     public static void init(MinecraftServer server) {
-        if (dataFile != null) return;
-
-        // 获取世界根目录
         Path basePath = server.getSavePath(WorldSavePath.ROOT);
         Path modFolder = basePath.resolve("eternal_firework_rocket");
         try {
@@ -41,33 +47,48 @@ public class PlayerConversionTracker {
         }
         dataFile = modFolder.resolve("conversion.json").toFile();
 
-        // 加载现有数据，如果文件不存在则创建空文件
+        dirty = false;
+        ticksSinceSave = 0;
         load();
         if (!dataFile.exists()) {
-            save(); // 创建空 json 文件
+            save();
         }
-
-        // 注册玩家登录事件，自动添加条目（false）
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server1) -> {
-            ServerPlayerEntity player = handler.getPlayer();
-            registerPlayer(player);
-        });
 
         LOGGER.info("Conversion tracker initialized, file: " + dataFile.getAbsolutePath());
     }
 
-    // 玩家登录时调用，若不存在则添加 false
+    /** Called when the server stopped, flushing pending changes and clearing state. */
+    public static void shutdown() {
+        if (dirty) {
+            save();
+        }
+        dataFile = null;
+        conversionMap.clear();
+        dirty = false;
+        ticksSinceSave = 0;
+    }
+
+    /** Flushes pending changes periodically instead of on every change. */
+    public static void tick(MinecraftServer server) {
+        if (!dirty) {
+            return;
+        }
+        if (++ticksSinceSave >= SAVE_INTERVAL_TICKS) {
+            save();
+        }
+    }
+
+    /** Player login: remember new players without writing to disk on every join. */
     public static void registerPlayer(ServerPlayerEntity player) {
         String key = getPlayerKey(player);
-        if (!conversionMap.containsKey(key)) {
-            conversionMap.put(key, false);
-            save();
+        if (conversionMap.putIfAbsent(key, false) == null) {
+            dirty = true;
             LOGGER.debug("Registered player {} with conversion=false", key);
         }
     }
 
     private static void load() {
-        if (!dataFile.exists()) {
+        if (dataFile == null || !dataFile.exists()) {
             conversionMap.clear();
             return;
         }
@@ -84,18 +105,27 @@ public class PlayerConversionTracker {
     }
 
     private static void save() {
-        if (dataFile == null) return;
+        if (dataFile == null) {
+            return;
+        }
         try (Writer writer = new FileWriter(dataFile)) {
             GSON.toJson(conversionMap, writer);
+            dirty = false;
+            ticksSinceSave = 0;
         } catch (IOException e) {
             LOGGER.error("Failed to save conversion data", e);
         }
+    }
+
+    private static String getPlayerKey(ServerPlayerEntity player) {
+        return player.getName().getString() + "," + player.getUuidAsString();
     }
 
     public static boolean hasConverted(ServerPlayerEntity player) {
         return conversionMap.getOrDefault(getPlayerKey(player), false);
     }
 
+    /** Evolution is rare and meaningful, so write it through immediately. */
     public static void setConverted(ServerPlayerEntity player, boolean converted) {
         conversionMap.put(getPlayerKey(player), converted);
         save();
