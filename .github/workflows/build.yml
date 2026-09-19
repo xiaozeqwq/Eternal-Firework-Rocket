@@ -61,7 +61,6 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-  # 只负责合并构建产物（与 release 并行执行）
   package:
     name: package
     runs-on: ubuntu-24.04
@@ -82,7 +81,6 @@ jobs:
           path: all-jars/
           if-no-files-found: error
 
-  # 新增任务：创建 tag/release，并把每个单独的 jar 逐个上传到 release
   release:
     name: release
     runs-on: ubuntu-24.04
@@ -101,19 +99,67 @@ jobs:
         run: |
           VERSION=$(grep -E '^mod\.version=' gradle.properties | cut -d= -f2)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      - name: get commit message
+        id: commit
+        run: |
+          echo "message<<EOF" >> "$GITHUB_OUTPUT"
+          git log -1 --pretty=%B >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
       - name: create tag and release with individual jars
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.mod_version.outputs.version }}
           name: v${{ steps.mod_version.outputs.version }}
-          generate_release_notes: true
+          body: ${{ steps.commit.outputs.message }}
           files: all-jars/**/*.jar
 
-  # 等 package 和 release 都完成后再清理临时 artifact，避免竞态
+  modrinth:
+    name: publish to Modrinth
+    runs-on: ubuntu-24.04
+    needs: [package, release]
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+      - name: download all staged jars
+        uses: actions/download-artifact@v4
+        with:
+          pattern: jar-*
+          path: all-jars
+          merge-multiple: true
+      - name: read mod version
+        id: mod_version
+        run: |
+          VERSION=$(grep -E '^mod\.version=' gradle.properties | cut -d= -f2)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+      - name: get commit message
+        id: commit
+        run: |
+          echo "message<<EOF" >> "$GITHUB_OUTPUT"
+          git log -1 --pretty=%B >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+      - name: publish to Modrinth
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: eternal-firework-rocket
+          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
+          version: ${{ steps.mod_version.outputs.version }}
+          version-type: release
+          loaders: fabric
+          game-versions: |
+            1.20.1
+            1.20.2
+            1.20.4
+            1.20.6
+            1.21
+            1.21.1
+            1.21.4
+          files: all-jars/**/*.jar
+          changelog: ${{ steps.commit.outputs.message }}
+
   cleanup:
     name: cleanup
     runs-on: ubuntu-24.04
-    needs: [package, release]
+    needs: [package, release, modrinth]
     if: always()
     steps:
       - name: remove per-version temporary artifacts
