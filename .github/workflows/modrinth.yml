@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: download latest release jars
         env:
@@ -79,6 +81,8 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: download specific jar
         env:
@@ -93,7 +97,8 @@ jobs:
         with:
           modrinth-id: eternal-firework-rocket
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          version: ${{ needs.prepare.outputs.mod_version }}+${{ matrix.mc }}
+          version: ${{ needs.prepare.outputs.mod_version }}
+          name: "Eternal Firework Rocket ${{ needs.prepare.outputs.mod_version }}+mc${{ matrix.mc }}"
           version-type: release
           loaders: fabric
           game-versions: ${{ matrix.mc }}
