@@ -53,6 +53,25 @@ jobs:
           SC_VERSION: ${{ matrix.mc }}
           GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
         run: ./gradlew :${{ matrix.mc }}:build --stacktrace --no-daemon
+
+      # 把构建出来的 jar 重命名，加上 +<mc> 后缀，方便 modrinth.yml 解析
+      - name: rename jars with mc suffix
+        shell: bash
+        run: |
+          cd versions/${{ matrix.mc }}/build/libs/
+          mc="${{ matrix.mc }}"
+          for f in *.jar; do
+            case "$f" in
+              *-sources.jar|*-dev.jar|*-javadoc.jar) continue ;;
+            esac
+            base="${f%.jar}"
+            if [[ "$base" == *"+$mc" ]]; then
+              continue
+            fi
+            mv "$f" "${base}+$mc.jar"
+          done
+          ls -la
+
       - name: stage jar (temporary)
         uses: actions/upload-artifact@v4
         with:
@@ -111,55 +130,16 @@ jobs:
           tag_name: v${{ steps.mod_version.outputs.version }}
           name: v${{ steps.mod_version.outputs.version }}
           body: ${{ steps.commit.outputs.message }}
-          files: all-jars/**/*.jar
-
-  modrinth:
-    name: publish to Modrinth
-    runs-on: ubuntu-24.04
-    needs: [package, release]
-    steps:
-      - name: checkout repository
-        uses: actions/checkout@v4
-      - name: download all staged jars
-        uses: actions/download-artifact@v4
-        with:
-          pattern: jar-*
-          path: all-jars
-          merge-multiple: true
-      - name: read mod version
-        id: mod_version
-        run: |
-          VERSION=$(grep -E '^mod\.version=' gradle.properties | cut -d= -f2)
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-      - name: get commit message
-        id: commit
-        run: |
-          echo "message<<EOF" >> "$GITHUB_OUTPUT"
-          git log -1 --pretty=%B >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
-      - name: publish to Modrinth
-        uses: Kir-Antipov/mc-publish@v3.3
-        with:
-          modrinth-id: eternal-firework-rocket
-          modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          version: ${{ steps.mod_version.outputs.version }}
-          version-type: release
-          loaders: fabric
-          game-versions: |
-            1.20.1
-            1.20.2
-            1.20.4
-            1.20.6
-            1.21
-            1.21.1
-            1.21.4
-          files: all-jars/**/*.jar
-          changelog: ${{ steps.commit.outputs.message }}
+          files: |
+            all-jars/**/*.jar
+            !all-jars/**/*-sources.jar
+            !all-jars/**/*-dev.jar
+            !all-jars/**/*-javadoc.jar
 
   cleanup:
     name: cleanup
     runs-on: ubuntu-24.04
-    needs: [package, release, modrinth]
+    needs: [package, release]
     if: always()
     steps:
       - name: remove per-version temporary artifacts
