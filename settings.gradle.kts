@@ -1,9 +1,11 @@
 pluginManagement {
     repositories {
         gradlePluginPortal()
-        maven("https://maven.fabricmc.net")
-        maven("https://maven.kikugie.dev/releases")
-        maven("https://maven.kikugie.dev/snapshots")
+        maven("https://maven.fabricmc.net") { name = "FabricMC" }
+        maven("https://maven.neoforged.net/releases") { name = "NeoForged" }
+        maven("https://maven.minecraftforge.net") { name = "MinecraftForge" }
+        maven("https://maven.kikugie.dev/releases") { name = "KikuGie Releases" }
+        maven("https://maven.kikugie.dev/snapshots") { name = "KikuGie Snapshots" }
         mavenCentral()
         maven("https://maven.aliyun.com/repository/gradle-plugin")
         maven("https://maven.aliyun.com/repository/central")
@@ -11,12 +13,10 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.8.3"
+    id("dev.kikugie.stonecutter") version "0.9.8"
 }
 
 stonecutter {
-    kotlinController = true
-    centralScript = "build.gradle.kts"
     create(rootProject) {
         val allVersions = listOf(
             "1.20.1", "1.20.2", "1.20.3", "1.20.4", "1.20.5", "1.20.6",
@@ -30,8 +30,15 @@ stonecutter {
             ciVersion == active -> listOf(active)
             else -> listOf(active, ciVersion)
         }
-        versions.forEach { version(it, it) }
-        vcsVersion = active
+
+        fun match(version: String, vararg loaders: String) {
+            for (loader in loaders) {
+                version("$version-$loader", version).buildscript("build.$loader.gradle.kts")
+            }
+        }
+
+        versions.forEach { match(it, "fabric") }
+        vcsVersion = "$active-fabric"
     }
 }
 

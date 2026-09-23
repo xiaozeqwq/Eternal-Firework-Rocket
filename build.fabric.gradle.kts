@@ -6,7 +6,7 @@ plugins {
     `maven-publish`
 }
 
-val mcVersion = stonecutter.current.version
+val mcVersion = sc.current.version
 val modId = property("mod.id") as String
 val modVersion = property("mod.version") as String
 val mavenGroup = property("mod.group") as String
@@ -14,10 +14,10 @@ val yarnMappings = property("deps.yarn_mappings") as String
 val fabricApiVersion = property("deps.fabric_api_version") as String
 val fabricLoaderVersion = property("deps.fabric_loader") as String
 
-val javaVersion = if (stonecutter.eval(mcVersion, ">=1.20.5")) JavaVersion.VERSION_21 else JavaVersion.VERSION_17
+val javaVersion = if (sc.current.parsed >= "1.20.5") JavaVersion.VERSION_21 else JavaVersion.VERSION_17
 
-version = "$modVersion+$mcVersion"
 group = mavenGroup
+version = "$modVersion+$mcVersion"
 base {
     archivesName = "$modId-$mcVersion"
 }

@@ -1,6 +1,6 @@
 [versions]
 loom = "1.17.21"
-stonecutter = "0.8.3"
+stonecutter = "0.9.8"
 
 [plugins]
 loom = { id = "net.fabricmc.fabric-loom-remap", version.ref = "loom" }

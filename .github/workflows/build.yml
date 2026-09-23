@@ -52,13 +52,13 @@ jobs:
         env:
           SC_VERSION: ${{ matrix.mc }}
           GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
-        run: ./gradlew :${{ matrix.mc }}:build --stacktrace --no-daemon
+        run: ./gradlew :${{ matrix.mc }}-fabric:build --stacktrace --no-daemon
 
       # 把构建出来的 jar 重命名，加上 +<mc> 后缀，方便 modrinth.yml 解析
       - name: rename jars with mc suffix
         shell: bash
         run: |
-          cd versions/${{ matrix.mc }}/build/libs/
+          cd versions/${{ matrix.mc }}-fabric/build/libs/
           mc="${{ matrix.mc }}"
           for f in *.jar; do
             case "$f" in
@@ -76,7 +76,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jar-${{ matrix.mc }}
-          path: versions/${{ matrix.mc }}/build/libs/
+          path: versions/${{ matrix.mc }}-fabric/build/libs/
           if-no-files-found: error
           retention-days: 1
 
