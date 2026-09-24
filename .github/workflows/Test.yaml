@@ -1,0 +1,80 @@
+name: test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ matrix.mc }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      fail-fast: false
+      matrix:
+        mc:
+          - "1.20.1"
+          - "1.20.2"
+          - "1.20.3"
+          - "1.20.4"
+          - "1.20.5"
+          - "1.20.6"
+          - "1.21"
+          - "1.21.1"
+          - "1.21.2"
+          - "1.21.3"
+          - "1.21.4"
+          - "1.21.5"
+          - "1.21.6"
+          - "1.21.7"
+          - "1.21.8"
+          - "1.21.9"
+          - "1.21.10"
+          - "1.21.11"
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+      - name: validate gradle wrapper
+        uses: gradle/actions/wrapper-validation@v4
+      - name: setup jdk
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: setup gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: make gradle wrapper executable
+        run: chmod +x ./gradlew
+      - name: build Minecraft ${{ matrix.mc }}
+        env:
+          SC_DETACHED: "true"
+          GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
+        run: ./gradlew :${{ matrix.mc }}-fabric:build --stacktrace --no-daemon
+
+      # 把构建出来的 jar 重命名，加上 +<mc> 后缀
+      - name: rename jars with mc suffix
+        shell: bash
+        run: |
+          cd versions/${{ matrix.mc }}-fabric/build/libs/
+          mc="${{ matrix.mc }}"
+          for f in *.jar; do
+            case "$f" in
+              *-sources.jar|*-dev.jar|*-javadoc.jar) continue ;;
+            esac
+            base="${f%.jar}"
+            if [[ "$base" == *"+$mc" ]]; then
+              continue
+            fi
+            mv "$f" "${base}+$mc.jar"
+          done
+          ls -la
+
+      - name: upload jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: jar-${{ matrix.mc }}
+          path: versions/${{ matrix.mc }}-fabric/build/libs/
+          if-no-files-found: error
+          retention-days: 7
