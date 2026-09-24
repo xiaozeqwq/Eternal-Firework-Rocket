@@ -1,13 +1,13 @@
 package xiaoze_qwq_.eternal_firework_rocket.util;
 
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.ItemStack;
 
 //? if >=1.20.5 {
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.FireworksComponent;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.component.Fireworks;
 import java.util.List;
 //?} else {
-/*import net.minecraft.nbt.NbtCompound;
+/*import net.minecraft.nbt.CompoundTag;
 *///?}
 
 /**
@@ -23,31 +23,31 @@ public final class FireworkData {
 
     public static int getFlight(ItemStack stack) {
         //? if >=1.20.5 {
-        FireworksComponent component = stack.get(DataComponentTypes.FIREWORKS);
+        Fireworks component = stack.get(DataComponents.FIREWORKS);
         return clamp(component != null ? component.flightDuration() : MIN_FLIGHT);
         //?} else {
-        /*NbtCompound fireworks = stack.getSubNbt("Fireworks");
+        /*CompoundTag fireworks = stack.getTagElement("Fireworks");
         return clamp(fireworks != null ? fireworks.getByte("Flight") : MIN_FLIGHT);
         *///?}
     }
 
     public static void setFlight(ItemStack stack, int flight) {
         //? if >=1.20.5 {
-        stack.set(DataComponentTypes.FIREWORKS, createComponent(flight));
+        stack.set(DataComponents.FIREWORKS, createComponent(flight));
         //?} else {
-        /*stack.getOrCreateSubNbt("Fireworks").putByte("Flight", (byte) clamp(flight));
+        /*stack.getOrCreateTagElement("Fireworks").putByte("Flight", (byte) clamp(flight));
         *///?}
     }
 
     //? if >=1.20.5 {
-    public static FireworksComponent createComponent(int flight) {
-        return new FireworksComponent(clamp(flight), List.of());
+    public static Fireworks createComponent(int flight) {
+        return new Fireworks(clamp(flight), List.of());
     }
     //?} else {
-    /*public static NbtCompound createNbt(int flight) {
-        NbtCompound fireworks = new NbtCompound();
+    /*public static CompoundTag createNbt(int flight) {
+        CompoundTag fireworks = new CompoundTag();
         fireworks.putByte("Flight", (byte) clamp(flight));
-        NbtCompound root = new NbtCompound();
+        CompoundTag root = new CompoundTag();
         root.put("Fireworks", fireworks);
         return root;
     }

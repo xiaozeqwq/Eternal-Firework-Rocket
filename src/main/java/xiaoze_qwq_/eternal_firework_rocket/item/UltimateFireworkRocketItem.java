@@ -1,77 +1,75 @@
 package xiaoze_qwq_.eternal_firework_rocket.item;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.stat.Stats;
-import net.minecraft.util.Hand;
-import net.minecraft.world.World;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.stats.Stats;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import xiaoze_qwq_.eternal_firework_rocket.EternalFireworkRocket;
 import xiaoze_qwq_.eternal_firework_rocket.entity.UltimateFireworkRocketEntity;
 import xiaoze_qwq_.eternal_firework_rocket.util.PermissionHelper;
 
 //? if >=1.21.2 {
-import net.minecraft.util.ActionResult;
+import net.minecraft.world.InteractionResult;
 //?} else {
-/*import net.minecraft.util.TypedActionResult;
+/*import net.minecraft.world.InteractionResultHolder;
 *///?}
 
 public class UltimateFireworkRocketItem extends Item {
-    public UltimateFireworkRocketItem(Settings settings) {
+    public UltimateFireworkRocketItem(Properties settings) {
         super(settings);
     }
 
     @Override
-    public boolean hasGlint(ItemStack stack) {
+    public boolean isFoil(ItemStack stack) {
         return true;
     }
 
     @Override
     //? if >=1.21.2 {
-    public ActionResult use(World world, PlayerEntity user, Hand hand) {
+    public InteractionResult use(Level world, Player user, InteractionHand hand) {
     //?} else {
-    /*public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+    /*public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
     *///?}
-        ItemStack stack = user.getStackInHand(hand);
+        ItemStack stack = user.getItemInHand(hand);
 
-        if (!world.isClient() && !PermissionHelper.hasUsePermission(user)) {
+        if (!world.isClientSide() && !PermissionHelper.hasUsePermission(user)) {
             //? if >=1.21.2 {
-            return ActionResult.FAIL;
+            return InteractionResult.FAIL;
             //?} else {
-            /*return TypedActionResult.fail(stack);
+            /*return InteractionResultHolder.fail(stack);
             *///?}
         }
 
-        //? if >=1.21.2 {
-        if (!user.isGliding()) {
-            return ActionResult.FAIL;
+        if (!user.isFallFlying()) {
+            //? if >=1.21.2 {
+            return InteractionResult.FAIL;
+            //?} else {
+            /*return InteractionResultHolder.fail(stack);
+            *///?}
         }
-        //?} else {
-        /*if (!user.isFallFlying()) {
-            return TypedActionResult.fail(stack);
-        }
-        *///?}
 
-        if (!world.isClient()) {
+        if (!world.isClientSide()) {
             UltimateFireworkRocketEntity rocket = new UltimateFireworkRocketEntity(
                     EternalFireworkRocket.ULTIMATE_FIREWORK_ROCKET,
                     world,
                     user
             );
-            world.spawnEntity(rocket);
+            world.addFreshEntity(rocket);
 
             world.playSound(null, user.getX(), user.getY(), user.getZ(),
-                    SoundEvents.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundCategory.PLAYERS, 3.0F, 1.0F);
+                    SoundEvents.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundSource.PLAYERS, 3.0F, 1.0F);
 
-            user.incrementStat(Stats.USED.getOrCreateStat(this));
+            user.awardStat(Stats.ITEM_USED.get(this));
         }
 
         //? if >=1.21.2 {
-        return ActionResult.SUCCESS;
+        return InteractionResult.SUCCESS;
         //?} else {
-        /*return TypedActionResult.success(stack, world.isClient());
+        /*return InteractionResultHolder.success(stack, world.isClientSide());
         *///?}
     }
 }

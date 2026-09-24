@@ -10,7 +10,6 @@ val mcVersion = sc.current.version
 val modId = property("mod.id") as String
 val modVersion = property("mod.version") as String
 val mavenGroup = property("mod.group") as String
-val yarnMappings = property("deps.yarn_mappings") as String
 val fabricApiVersion = property("deps.fabric_api_version") as String
 val fabricLoaderVersion = property("deps.fabric_loader") as String
 
@@ -31,8 +30,9 @@ repositories {
 }
 
 val sourceSets = extensions.getByType<SourceSetContainer>()
+val loomExtension = extensions.getByType<LoomGradleExtensionAPI>()
 
-extensions.configure<LoomGradleExtensionAPI> {
+loomExtension.apply {
     splitEnvironmentSourceSets()
 
     mods.register(modId) {
@@ -43,7 +43,7 @@ extensions.configure<LoomGradleExtensionAPI> {
 
 dependencies {
     add("minecraft", "com.mojang:minecraft:$mcVersion")
-    add("mappings", "net.fabricmc:yarn:$yarnMappings:v2")
+    add("mappings", loomExtension.officialMojangMappings())
     add("modImplementation", "net.fabricmc:fabric-loader:$fabricLoaderVersion")
     add("modImplementation", "net.fabricmc.fabric-api:fabric-api:$fabricApiVersion")
 }

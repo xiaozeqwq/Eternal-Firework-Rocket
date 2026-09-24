@@ -1,23 +1,23 @@
 package xiaoze_qwq_.eternal_firework_rocket.entity;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.item.Items;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 //? if >=1.21.2 {
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.server.world.ServerWorld;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
 //?}
 //? if >=1.21.6 {
-import net.minecraft.storage.ReadView;
-import net.minecraft.storage.WriteView;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 //?} else {
-/*import net.minecraft.nbt.NbtCompound;
+/*import net.minecraft.nbt.CompoundTag;
 *///?}
 
 public class UltimateFireworkRocketEntity extends Entity {
@@ -28,36 +28,32 @@ public class UltimateFireworkRocketEntity extends Entity {
     private static final double DAMPING = 0.5;
     private static final double FORCE = 12.75;
 
-    public UltimateFireworkRocketEntity(EntityType<?> type, World world) {
+    public UltimateFireworkRocketEntity(EntityType<?> type, Level world) {
         super(type, world);
         this.setInvisible(true);
         this.setNoGravity(true);
-        this.noClip = true;
+        this.noPhysics = true;
     }
 
-    public UltimateFireworkRocketEntity(EntityType<?> type, World world, LivingEntity shooter) {
+    public UltimateFireworkRocketEntity(EntityType<?> type, Level world, LivingEntity shooter) {
         this(type, world);
         this.shooter = shooter;
-        this.setPosition(shooter.getX(), shooter.getY(), shooter.getZ());
+        this.setPos(shooter.getX(), shooter.getY(), shooter.getZ());
     }
 
     //? if >=1.20.5 {
     @Override
-    protected void initDataTracker(DataTracker.Builder builder) {}
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {}
     //?} else {
     /*@Override
-    protected void initDataTracker() {}
+    protected void defineSynchedData() {}
     *///?}
 
     @Override
     public void tick() {
         super.tick();
 
-        //? if >=1.21.2 {
-        if (shooter == null || !shooter.isAlive() || !shooter.isGliding()) {
-        //?} else {
-        /*if (shooter == null || !shooter.isAlive() || !shooter.isFallFlying()) {
-        *///?}
+        if (shooter == null || !shooter.isAlive() || !shooter.isFallFlying()) {
             this.discard();
             return;
         }
@@ -68,40 +64,19 @@ public class UltimateFireworkRocketEntity extends Entity {
             return;
         }
 
-        Vec3d vel = shooter.getVelocity();
-        Vec3d look = shooter.getRotationVector();
+        Vec3 vel = shooter.getDeltaMovement();
+        Vec3 look = shooter.getLookAngle();
         double newVelX = vel.x * DAMPING + look.x * FORCE;
         double newVelY = vel.y * DAMPING + look.y * FORCE;
         double newVelZ = vel.z * DAMPING + look.z * FORCE;
-        shooter.setVelocity(newVelX, newVelY, newVelZ);
-        //? if >=1.21.11 {
-        shooter.knockedBack = true;
-        //?} else {
-        /*shooter.velocityModified = true;
-        *///?}
+        shooter.setDeltaMovement(newVelX, newVelY, newVelZ);
+        shooter.hurtMarked = true;
 
-        //? if >=1.21.9 {
-        World entityWorld = getEntityWorld();
-        Vec3d pos = shooter.getEntityPos();
-        //?} else {
-        /*World entityWorld = getWorld();
-        Vec3d pos = shooter.getPos();
-        *///?}
-        if (entityWorld.isClient()) {
+        Level entityWorld = level();
+        Vec3 pos = shooter.position();
+        if (entityWorld.isClientSide()) {
             for (int i = 0; i < 5; i++) {
-                //? if >=1.21.5 {
-                entityWorld.addParticleClient(ParticleTypes.FLAME,
-                        pos.x + (random.nextDouble() - 0.5) * 1.0,
-                        pos.y + random.nextDouble() * 1.5,
-                        pos.z + (random.nextDouble() - 0.5) * 1.0,
-                        0, 0, 0);
-                entityWorld.addParticleClient(ParticleTypes.LARGE_SMOKE,
-                        pos.x + (random.nextDouble() - 0.5) * 1.0,
-                        pos.y + random.nextDouble() * 1.5,
-                        pos.z + (random.nextDouble() - 0.5) * 1.0,
-                        0, 0, 0);
-                //?} else {
-                /*entityWorld.addParticle(ParticleTypes.FLAME,
+                entityWorld.addParticle(ParticleTypes.FLAME,
                         pos.x + (random.nextDouble() - 0.5) * 1.0,
                         pos.y + random.nextDouble() * 1.5,
                         pos.z + (random.nextDouble() - 0.5) * 1.0,
@@ -111,32 +86,31 @@ public class UltimateFireworkRocketEntity extends Entity {
                         pos.y + random.nextDouble() * 1.5,
                         pos.z + (random.nextDouble() - 0.5) * 1.0,
                         0, 0, 0);
-                *///?}
             }
         }
 
-        Vec3d handOffset = shooter.getHandPosOffset(Items.FIREWORK_ROCKET);
-        this.setPosition(shooter.getX() + handOffset.x, shooter.getY() + handOffset.y, shooter.getZ() + handOffset.z);
-        this.setVelocity(shooter.getVelocity());
+        Vec3 handOffset = shooter.getHandHoldingItemAngle(Items.FIREWORK_ROCKET);
+        this.setPos(shooter.getX() + handOffset.x, shooter.getY() + handOffset.y, shooter.getZ() + handOffset.z);
+        this.setDeltaMovement(shooter.getDeltaMovement());
     }
 
     //? if >=1.21.6 {
     @Override
-    protected void readCustomData(ReadView view) {}
+    protected void readAdditionalSaveData(ValueInput view) {}
 
     @Override
-    protected void writeCustomData(WriteView view) {}
+    protected void addAdditionalSaveData(ValueOutput view) {}
     //?} else {
     /*@Override
-    protected void readCustomDataFromNbt(NbtCompound nbt) {}
+    protected void readAdditionalSaveData(CompoundTag nbt) {}
 
     @Override
-    protected void writeCustomDataToNbt(NbtCompound nbt) {}
+    protected void addAdditionalSaveData(CompoundTag nbt) {}
     *///?}
 
     //? if >=1.21.2 {
     @Override
-    public boolean damage(ServerWorld world, DamageSource source, float amount) {
+    public boolean hurtServer(ServerLevel world, DamageSource source, float amount) {
         return false;
     }
     //?}
@@ -147,7 +121,7 @@ public class UltimateFireworkRocketEntity extends Entity {
     }
 
     @Override
-    public boolean shouldSave() {
+    public boolean shouldBeSaved() {
         return false;
     }
 }

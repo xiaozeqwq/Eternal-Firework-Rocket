@@ -1,18 +1,20 @@
 package xiaoze_qwq_.eternal_firework_rocket.client.render;
 
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import xiaoze_qwq_.eternal_firework_rocket.entity.UltimateFireworkRocketEntity;
 
 //? if >=1.21.2 {
-import net.minecraft.client.render.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 //?} else {
-/*import net.minecraft.util.Identifier;
+/*import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.resources.ResourceLocation;
 *///?}
 
 //? if >=1.21.2 {
 public class UltimateFireworkRocketEntityRenderer extends EntityRenderer<UltimateFireworkRocketEntity, EntityRenderState> {
-    public UltimateFireworkRocketEntityRenderer(EntityRendererFactory.Context ctx) {
+    public UltimateFireworkRocketEntityRenderer(EntityRendererProvider.Context ctx) {
         super(ctx);
     }
 
@@ -23,19 +25,19 @@ public class UltimateFireworkRocketEntityRenderer extends EntityRenderer<Ultimat
 }
 //?} else {
 /*public class UltimateFireworkRocketEntityRenderer extends EntityRenderer<UltimateFireworkRocketEntity> {
-    public UltimateFireworkRocketEntityRenderer(EntityRendererFactory.Context ctx) {
+    public UltimateFireworkRocketEntityRenderer(EntityRendererProvider.Context ctx) {
         super(ctx);
     }
 
     @Override
-    public Identifier getTexture(UltimateFireworkRocketEntity entity) {
+    public ResourceLocation getTextureLocation(UltimateFireworkRocketEntity entity) {
         return null;
     }
 
     @Override
     public void render(UltimateFireworkRocketEntity entity, float yaw, float tickDelta,
-                       net.minecraft.client.util.math.MatrixStack matrices,
-                       net.minecraft.client.render.VertexConsumerProvider vertexConsumers, int light) {
+                       PoseStack matrices,
+                       MultiBufferSource vertexConsumers, int light) {
     }
 }
 *///?}

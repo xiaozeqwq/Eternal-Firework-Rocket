@@ -1,12 +1,12 @@
 package xiaoze_qwq_.eternal_firework_rocket.util;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
 import xiaoze_qwq_.eternal_firework_rocket.config.ModConfig;
 
 //? if >=1.21.11 {
-import net.minecraft.command.permission.Permission;
-import net.minecraft.command.permission.PermissionLevel;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.PermissionLevel;
 //?}
 
 /**
@@ -17,17 +17,17 @@ import net.minecraft.command.permission.PermissionLevel;
 public final class PermissionHelper {
     private PermissionHelper() {}
 
-    public static boolean hasUsePermission(PlayerEntity user) {
+    public static boolean hasUsePermission(Player user) {
         if (!ModConfig.CONFIG.adminOnly) {
             return true;
         }
-        if (!(user instanceof ServerPlayerEntity serverPlayer)) {
+        if (!(user instanceof ServerPlayer serverPlayer)) {
             return true;
         }
         //? if >=1.21.11 {
-        return serverPlayer.getPermissions().hasPermission(new Permission.Level(PermissionLevel.GAMEMASTERS));
+        return serverPlayer.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.GAMEMASTERS));
         //?} else {
-        /*return serverPlayer.hasPermissionLevel(2);
+        /*return serverPlayer.hasPermissions(2);
         *///?}
     }
 }

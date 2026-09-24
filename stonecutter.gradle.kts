@@ -12,4 +12,12 @@ stonecutter parameters {
     constants {
         match(loader, "fabric", "neoforge", "forge")
     }
+
+    // Mojang rename `ResourceLocation` to `Identifier` (and `location()` to `identifier()`) in 1.21.11
+    replacements {
+        string(current.parsed >= "1.21.11") {
+            replace("ResourceLocation", "Identifier")
+            replace("location()", "identifier()")
+        }
+    }
 }

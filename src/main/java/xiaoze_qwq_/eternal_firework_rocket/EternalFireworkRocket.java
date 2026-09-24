@@ -3,16 +3,16 @@ package xiaoze_qwq_.eternal_firework_rocket;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xiaoze_qwq_.eternal_firework_rocket.config.ModConfig;
@@ -25,8 +25,8 @@ import xiaoze_qwq_.eternal_firework_rocket.util.FireworkData;
 import xiaoze_qwq_.eternal_firework_rocket.util.PlayerConversionTracker;
 
 //? if >=1.21.2 {
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 //?}
 
 public class EternalFireworkRocket implements ModInitializer {
@@ -42,61 +42,53 @@ public class EternalFireworkRocket implements ModInitializer {
             registerUltimateFireworkRocket();
 
     public static final Item ETERNAL_FIREWORK_ROCKET =
-            new EternalFireworkRocketItem(itemSettings("eternal_firework_rocket").maxCount(1));
+            new EternalFireworkRocketItem(itemSettings("eternal_firework_rocket").stacksTo(1));
     public static final Item ULTIMATE_FIREWORK_ROCKET_ITEM =
-            new UltimateFireworkRocketItem(itemSettings("eternal_firework_rocket_ultimate").maxCount(1).fireproof());
+            new UltimateFireworkRocketItem(itemSettings("eternal_firework_rocket_ultimate").stacksTo(1).fireResistant());
 
-    private static Identifier id(String path) {
+    private static ResourceLocation id(String path) {
         //? if >=1.21 {
-        return Identifier.of(MOD_ID, path);
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
         //?} else {
-        /*return new Identifier(MOD_ID, path);
+        /*return new ResourceLocation(MOD_ID, path);
         *///?}
     }
 
-    private static Item.Settings itemSettings(String path) {
-        Item.Settings settings = new Item.Settings();
+    private static Item.Properties itemSettings(String path) {
+        Item.Properties settings = new Item.Properties();
         //? if >=1.21.2 {
-        settings.registryKey(RegistryKey.of(RegistryKeys.ITEM, id(path)));
+        settings.setId(ResourceKey.create(Registries.ITEM, id(path)));
         //?}
         return settings;
     }
 
     private static EntityType<InvisibleFireworkRocketEntity> registerInvisibleFireworkRocket() {
-        Identifier id = id("invisible_firework_rocket");
+        ResourceLocation id = id("invisible_firework_rocket");
         EntityType.Builder<InvisibleFireworkRocketEntity> builder = EntityType.Builder
-                .<InvisibleFireworkRocketEntity>create(InvisibleFireworkRocketEntity::new, SpawnGroup.MISC)
-                //? if >=1.20.5 {
-                .dimensions(0.25f, 0.25f)
-                //?} else {
-                /*.setDimensions(0.25f, 0.25f)
-                *///?}
-                .maxTrackingRange(4)
-                .trackingTickInterval(10);
+                .<InvisibleFireworkRocketEntity>of(InvisibleFireworkRocketEntity::new, MobCategory.MISC)
+                .sized(0.25f, 0.25f)
+                .clientTrackingRange(4)
+                .updateInterval(10);
         //? if >=1.21.2 {
-        RegistryKey<EntityType<?>> key = RegistryKey.of(RegistryKeys.ENTITY_TYPE, id);
-        return Registry.register(Registries.ENTITY_TYPE, key, builder.build(key));
+        ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, id);
+        return Registry.register(BuiltInRegistries.ENTITY_TYPE, key, builder.build(key));
         //?} else {
-        /*return Registry.register(Registries.ENTITY_TYPE, id, builder.build("invisible_firework_rocket"));
+        /*return Registry.register(BuiltInRegistries.ENTITY_TYPE, id, builder.build("invisible_firework_rocket"));
         *///?}
     }
 
     private static EntityType<UltimateFireworkRocketEntity> registerUltimateFireworkRocket() {
-        Identifier id = id("ultimate_firework_rocket");
+        ResourceLocation id = id("ultimate_firework_rocket");
         EntityType.Builder<UltimateFireworkRocketEntity> builder = EntityType.Builder
-                .<UltimateFireworkRocketEntity>create(UltimateFireworkRocketEntity::new, SpawnGroup.MISC)
-                //? if >=1.20.5 {
-                .dimensions(0.25f, 0.25f)
-                //?} else {
-                /*.setDimensions(0.25f, 0.25f)
-                *///?}
-                .maxTrackingRange(4)
-                .trackingTickInterval(10);
+                .<UltimateFireworkRocketEntity>of(UltimateFireworkRocketEntity::new, MobCategory.MISC)
+                .sized(0.25f, 0.25f)
+                .clientTrackingRange(4)
+                .updateInterval(10);
         //? if >=1.21.2 {
-        RegistryKey<EntityType<?>> key = RegistryKey.of(RegistryKeys.ENTITY_TYPE, id);
-        return Registry.register(Registries.ENTITY_TYPE, key, builder.build(key));
+        ResourceKey<EntityType<?>> key = ResourceKey.create(Registries.ENTITY_TYPE, id);
+        return Registry.register(BuiltInRegistries.ENTITY_TYPE, key, builder.build(key));
         //?} else {
-        /*return Registry.register(Registries.ENTITY_TYPE, id, builder.build("ultimate_firework_rocket"));
+        /*return Registry.register(BuiltInRegistries.ENTITY_TYPE, id, builder.build("ultimate_firework_rocket"));
         *///?}
     }
 
@@ -104,8 +96,8 @@ public class EternalFireworkRocket implements ModInitializer {
     public void onInitialize() {
         LOGGER.info("Eternal Firework Rocket Mod Initializing...");
 
-        Registry.register(Registries.ITEM, id("eternal_firework_rocket"), ETERNAL_FIREWORK_ROCKET);
-        Registry.register(Registries.ITEM, id("eternal_firework_rocket_ultimate"), ULTIMATE_FIREWORK_ROCKET_ITEM);
+        Registry.register(BuiltInRegistries.ITEM, id("eternal_firework_rocket"), ETERNAL_FIREWORK_ROCKET);
+        Registry.register(BuiltInRegistries.ITEM, id("eternal_firework_rocket_ultimate"), ULTIMATE_FIREWORK_ROCKET_ITEM);
 
         ModConfig.loadConfig();
         ModLootTableModifier.registerLootTableModifications();
@@ -117,18 +109,14 @@ public class EternalFireworkRocket implements ModInitializer {
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             PlayerConversionTracker.tick(server);
 
-            for (ServerPlayerEntity player : server.getPlayerManager().getPlayerList()) {
-                //? if >=1.21.2 {
-                boolean flying = player.isGliding();
-                //?} else {
-                /*boolean flying = player.isFallFlying();
-                *///?}
+            for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+                boolean flying = player.isFallFlying();
                 if (flying && player.getY() >= EVOLUTION_Y && !PlayerConversionTracker.hasConverted(player)) {
-                    Hand hand = findMaxEternalHand(player);
+                    InteractionHand hand = findMaxEternalHand(player);
                     if (hand != null) {
-                        player.setStackInHand(hand, new ItemStack(ULTIMATE_FIREWORK_ROCKET_ITEM));
+                        player.setItemInHand(hand, new ItemStack(ULTIMATE_FIREWORK_ROCKET_ITEM));
                         PlayerConversionTracker.setConverted(player, true);
-                        player.sendMessage(Text.translatable("message.eternal-firework-rocket.evolution"), true);
+                        player.displayClientMessage(Component.translatable("message.eternal-firework-rocket.evolution"), true);
                     }
                 }
             }
@@ -137,17 +125,17 @@ public class EternalFireworkRocket implements ModInitializer {
         LOGGER.info("Eternal Firework Rocket Mod Initialized!");
     }
 
-    private static Hand findMaxEternalHand(ServerPlayerEntity player) {
-        if (isMaxEternal(player.getMainHandStack())) {
-            return Hand.MAIN_HAND;
+    private static InteractionHand findMaxEternalHand(ServerPlayer player) {
+        if (isMaxEternal(player.getMainHandItem())) {
+            return InteractionHand.MAIN_HAND;
         }
-        if (isMaxEternal(player.getOffHandStack())) {
-            return Hand.OFF_HAND;
+        if (isMaxEternal(player.getOffHandItem())) {
+            return InteractionHand.OFF_HAND;
         }
         return null;
     }
 
     private static boolean isMaxEternal(ItemStack stack) {
-        return stack.isOf(ETERNAL_FIREWORK_ROCKET) && FireworkData.getFlight(stack) >= FireworkData.MAX_FLIGHT;
+        return stack.is(ETERNAL_FIREWORK_ROCKET) && FireworkData.getFlight(stack) >= FireworkData.MAX_FLIGHT;
     }
 }

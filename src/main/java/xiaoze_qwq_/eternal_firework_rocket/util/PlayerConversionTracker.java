@@ -5,8 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.WorldSavePath;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.storage.LevelResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +38,7 @@ public class PlayerConversionTracker {
 
     /** Called when the server finished loading a world. */
     public static void init(MinecraftServer server) {
-        Path basePath = server.getSavePath(WorldSavePath.ROOT);
+        Path basePath = server.getWorldPath(LevelResource.ROOT);
         Path modFolder = basePath.resolve("eternal_firework_rocket");
         try {
             Files.createDirectories(modFolder);
@@ -79,7 +79,7 @@ public class PlayerConversionTracker {
     }
 
     /** Player login: remember new players without writing to disk on every join. */
-    public static void registerPlayer(ServerPlayerEntity player) {
+    public static void registerPlayer(ServerPlayer player) {
         String key = getPlayerKey(player);
         if (conversionMap.putIfAbsent(key, false) == null) {
             dirty = true;
@@ -117,16 +117,16 @@ public class PlayerConversionTracker {
         }
     }
 
-    private static String getPlayerKey(ServerPlayerEntity player) {
-        return player.getName().getString() + "," + player.getUuidAsString();
+    private static String getPlayerKey(ServerPlayer player) {
+        return player.getName().getString() + "," + player.getStringUUID();
     }
 
-    public static boolean hasConverted(ServerPlayerEntity player) {
+    public static boolean hasConverted(ServerPlayer player) {
         return conversionMap.getOrDefault(getPlayerKey(player), false);
     }
 
     /** Evolution is rare and meaningful, so write it through immediately. */
-    public static void setConverted(ServerPlayerEntity player, boolean converted) {
+    public static void setConverted(ServerPlayer player, boolean converted) {
         conversionMap.put(getPlayerKey(player), converted);
         save();
     }
