@@ -2,7 +2,14 @@ plugins {
     id("dev.kikugie.stonecutter")
 }
 
-stonecutter active "1.21.11-fabric" /* [SC] DO NOT EDIT */
+// In CI every node is built with `stonecutterGenerate`, so Stonecutter runs detached
+// (`active null`). Keeping a literal active version here leaves the root `src/` linked
+// for local development, but that link skips processing and thus skips replacements.
+if (System.getenv("SC_DETACHED") == "true") {
+    stonecutter active null
+} else {
+    stonecutter active "1.21.11-fabric"
+}
 
 // See https://stonecutter.kikugie.dev/wiki/config/params
 stonecutter parameters {

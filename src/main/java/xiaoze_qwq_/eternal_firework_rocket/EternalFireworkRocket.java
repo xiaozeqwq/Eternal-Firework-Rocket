@@ -129,7 +129,7 @@ public class EternalFireworkRocket implements ModInitializer {
         if (isMaxEternal(player.getMainHandItem())) {
             return InteractionHand.MAIN_HAND;
         }
-        if (isMaxEternal(player.getOffHandItem())) {
+        if (isMaxEternal(player.getOffhandItem())) {
             return InteractionHand.OFF_HAND;
         }
         return null;

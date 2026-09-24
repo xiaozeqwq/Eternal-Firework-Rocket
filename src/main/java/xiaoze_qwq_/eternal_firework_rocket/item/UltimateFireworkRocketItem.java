@@ -61,7 +61,7 @@ public class UltimateFireworkRocketItem extends Item {
             world.addFreshEntity(rocket);
 
             world.playSound(null, user.getX(), user.getY(), user.getZ(),
-                    SoundEvents.ENTITY_FIREWORK_ROCKET_LAUNCH, SoundSource.PLAYERS, 3.0F, 1.0F);
+                    SoundEvents.FIREWORK_ROCKET_LAUNCH, SoundSource.PLAYERS, 3.0F, 1.0F);
 
             user.awardStat(Stats.ITEM_USED.get(this));
         }
@@ -69,7 +69,7 @@ public class UltimateFireworkRocketItem extends Item {
         //? if >=1.21.2 {
         return InteractionResult.SUCCESS;
         //?} else {
-        /*return InteractionResultHolder.success(stack, world.isClientSide());
+        /*return InteractionResultHolder.success(stack);
         *///?}
     }
 }
