@@ -49,6 +49,7 @@ jobs:
         run: chmod +x ./gradlew
       - name: build Minecraft ${{ matrix.mc }}
         env:
+          SC_VERSION: ${{ matrix.mc }}
           SC_DETACHED: "true"
           GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
         run: ./gradlew :${{ matrix.mc }}-fabric:build --stacktrace --no-daemon

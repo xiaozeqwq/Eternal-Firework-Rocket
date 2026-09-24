@@ -23,13 +23,7 @@ stonecutter {
             "1.21", "1.21.1", "1.21.2", "1.21.3", "1.21.4", "1.21.5",
             "1.21.6", "1.21.7", "1.21.8", "1.21.9", "1.21.10", "1.21.11"
         )
-        val ciVersion = System.getenv("SC_VERSION")
         val active = "1.21.11"
-        val versions = when {
-            ciVersion.isNullOrBlank() -> allVersions
-            ciVersion == active -> listOf(active)
-            else -> listOf(active, ciVersion)
-        }
 
         fun match(version: String, vararg loaders: String) {
             for (loader in loaders) {
@@ -37,8 +31,16 @@ stonecutter {
             }
         }
 
-        versions.forEach { match(it, "fabric") }
-        vcsVersion = "$active-fabric"
+        // CI passes `SC_VERSION` to create only the node that is being built,
+        // which avoids configuring all 18 subprojects in every job.
+        val ciVersion = System.getenv("SC_VERSION")
+        if (ciVersion.isNullOrBlank()) {
+            allVersions.forEach { match(it, "fabric") }
+            vcsVersion = "$active-fabric"
+        } else {
+            match(ciVersion, "fabric")
+            vcsVersion = "$ciVersion-fabric"
+        }
     }
 }
 
