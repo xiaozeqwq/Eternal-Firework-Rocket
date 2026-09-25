@@ -26,6 +26,9 @@ public class ModLootTableModifier {
 
     public static void registerLootTableModifications(Platform platform) {
         platform.registerLootTableModifier();
+        //? if fabric {
+        FabricLootEvents.register();
+        //?}
     }
 
     /** Adds the configured firework rocket pools to the given loot table. */

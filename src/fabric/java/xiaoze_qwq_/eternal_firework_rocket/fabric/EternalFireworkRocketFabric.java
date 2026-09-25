@@ -8,17 +8,10 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import xiaoze_qwq_.eternal_firework_rocket.EternalFireworkRocket;
-import xiaoze_qwq_.eternal_firework_rocket.loot.ModLootTableModifier;
 import xiaoze_qwq_.eternal_firework_rocket.platform.Platform;
 
 import java.nio.file.Path;
 import java.util.function.Consumer;
-
-//? if >=1.21 {
-import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
-//?} else {
-/*import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
-*///?}
 
 public class EternalFireworkRocketFabric implements ModInitializer, Platform {
 
@@ -54,18 +47,6 @@ public class EternalFireworkRocketFabric implements ModInitializer, Platform {
 
     @Override
     public void registerLootTableModifier() {
-        //? if >=1.21 {
-        LootTableEvents.MODIFY.register((key, builder, source, lookup) -> {
-            if (("minecraft:" + ModLootTableModifier.END_CITY_TREASURE).equals(key.location().toString())) {
-                ModLootTableModifier.apply(builder);
-            }
-        });
-        //?} else {
-        /*LootTableEvents.MODIFY.register((resourceManager, lootManager, id, tableBuilder, source) -> {
-            if (("minecraft:" + ModLootTableModifier.END_CITY_TREASURE).equals(id.toString())) {
-                ModLootTableModifier.apply(tableBuilder);
-            }
-        });
-        *///?}
+        // Handled by FabricLootEvents in the shared source tree (version conditionals).
     }
 }
