@@ -1,12 +1,10 @@
 package xiaoze_qwq_.eternal_firework_rocket;
 
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
@@ -21,6 +19,7 @@ import xiaoze_qwq_.eternal_firework_rocket.entity.UltimateFireworkRocketEntity;
 import xiaoze_qwq_.eternal_firework_rocket.item.EternalFireworkRocketItem;
 import xiaoze_qwq_.eternal_firework_rocket.item.UltimateFireworkRocketItem;
 import xiaoze_qwq_.eternal_firework_rocket.loot.ModLootTableModifier;
+import xiaoze_qwq_.eternal_firework_rocket.platform.Platform;
 import xiaoze_qwq_.eternal_firework_rocket.util.FireworkData;
 import xiaoze_qwq_.eternal_firework_rocket.util.PlayerConversionTracker;
 
@@ -29,7 +28,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 //?}
 
-public class EternalFireworkRocket implements ModInitializer {
+public class EternalFireworkRocket {
     public static final String MOD_ID = "eternal-firework-rocket";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
@@ -46,7 +45,43 @@ public class EternalFireworkRocket implements ModInitializer {
     public static final Item ULTIMATE_FIREWORK_ROCKET_ITEM =
             new UltimateFireworkRocketItem(itemSettings("eternal_firework_rocket_ultimate").stacksTo(1).fireResistant());
 
-    private static ResourceLocation id(String path) {
+    /** Shared initialisation invoked by every loader entrypoint. */
+    public static void init(Platform platform) {
+        LOGGER.info("Eternal Firework Rocket Mod Initializing...");
+
+        Registry.register(BuiltInRegistries.ITEM, id("eternal_firework_rocket"), ETERNAL_FIREWORK_ROCKET);
+        Registry.register(BuiltInRegistries.ITEM, id("eternal_firework_rocket_ultimate"), ULTIMATE_FIREWORK_ROCKET_ITEM);
+
+        ModConfig.configDir = platform.getConfigDir().toFile();
+        ModConfig.loadConfig();
+
+        ModLootTableModifier.registerLootTableModifications(platform);
+        PlayerConversionTracker.registerEvents(platform);
+
+        platform.onServerStarted(PlayerConversionTracker::init);
+        platform.onServerStopped(server -> PlayerConversionTracker.shutdown());
+        platform.onServerTick(EternalFireworkRocket::onServerTick);
+
+        LOGGER.info("Eternal Firework Rocket Mod Initialized!");
+    }
+
+    private static void onServerTick(MinecraftServer server) {
+        PlayerConversionTracker.tick(server);
+
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) {
+            boolean flying = player.isFallFlying();
+            if (flying && player.getY() >= EVOLUTION_Y && !PlayerConversionTracker.hasConverted(player)) {
+                InteractionHand hand = findMaxEternalHand(player);
+                if (hand != null) {
+                    player.setItemInHand(hand, new ItemStack(ULTIMATE_FIREWORK_ROCKET_ITEM));
+                    PlayerConversionTracker.setConverted(player, true);
+                    player.displayClientMessage(Component.translatable("message.eternal-firework-rocket.evolution"), true);
+                }
+            }
+        }
+    }
+
+    public static ResourceLocation id(String path) {
         //? if >=1.21 {
         return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
         //?} else {
@@ -90,39 +125,6 @@ public class EternalFireworkRocket implements ModInitializer {
         //?} else {
         /*return Registry.register(BuiltInRegistries.ENTITY_TYPE, id, builder.build("ultimate_firework_rocket"));
         *///?}
-    }
-
-    @Override
-    public void onInitialize() {
-        LOGGER.info("Eternal Firework Rocket Mod Initializing...");
-
-        Registry.register(BuiltInRegistries.ITEM, id("eternal_firework_rocket"), ETERNAL_FIREWORK_ROCKET);
-        Registry.register(BuiltInRegistries.ITEM, id("eternal_firework_rocket_ultimate"), ULTIMATE_FIREWORK_ROCKET_ITEM);
-
-        ModConfig.loadConfig();
-        ModLootTableModifier.registerLootTableModifications();
-        PlayerConversionTracker.registerEvents();
-
-        ServerLifecycleEvents.SERVER_STARTED.register(PlayerConversionTracker::init);
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> PlayerConversionTracker.shutdown());
-
-        ServerTickEvents.END_SERVER_TICK.register(server -> {
-            PlayerConversionTracker.tick(server);
-
-            for (ServerPlayer player : server.getPlayerList().getPlayers()) {
-                boolean flying = player.isFallFlying();
-                if (flying && player.getY() >= EVOLUTION_Y && !PlayerConversionTracker.hasConverted(player)) {
-                    InteractionHand hand = findMaxEternalHand(player);
-                    if (hand != null) {
-                        player.setItemInHand(hand, new ItemStack(ULTIMATE_FIREWORK_ROCKET_ITEM));
-                        PlayerConversionTracker.setConverted(player, true);
-                        player.displayClientMessage(Component.translatable("message.eternal-firework-rocket.evolution"), true);
-                    }
-                }
-            }
-        });
-
-        LOGGER.info("Eternal Firework Rocket Mod Initialized!");
     }
 
     private static InteractionHand findMaxEternalHand(ServerPlayer player) {

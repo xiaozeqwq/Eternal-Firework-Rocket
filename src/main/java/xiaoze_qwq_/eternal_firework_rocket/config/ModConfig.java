@@ -2,7 +2,6 @@ package xiaoze_qwq_.eternal_firework_rocket.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,8 +12,13 @@ import java.io.IOException;
 
 public class ModConfig {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    public static final File CONFIG_FILE = new File(FabricLoader.getInstance().getConfigDir().toFile(), "eternal_firework_rocket.json");
+    /** Set by the loader entrypoint before {@link #loadConfig()} is called. */
+    public static File configDir = new File("config");
     public static final Logger LOGGER = LoggerFactory.getLogger("EternalFireworkRocket/Config");
+
+    private static File configFile() {
+        return new File(configDir, "eternal_firework_rocket.json");
+    }
     
     public static ConfigData CONFIG = new ConfigData();
     
@@ -32,8 +36,9 @@ public class ModConfig {
     }
     
     public static void loadConfig() {
-        if (CONFIG_FILE.exists()) {
-            try (FileReader reader = new FileReader(CONFIG_FILE)) {
+        File configFile = configFile();
+        if (configFile.exists()) {
+            try (FileReader reader = new FileReader(configFile)) {
                 CONFIG = GSON.fromJson(reader, ConfigData.class);
                 validateConfig();
             } catch (IOException e) {
@@ -45,7 +50,7 @@ public class ModConfig {
     }
     
     public static void saveConfig() {
-        try (FileWriter writer = new FileWriter(CONFIG_FILE)) {
+        try (FileWriter writer = new FileWriter(configFile())) {
             GSON.toJson(CONFIG, writer);
         } catch (IOException e) {
             LOGGER.error("Failed to save config file", e);

@@ -32,12 +32,11 @@ repositories {
 val sourceSets = extensions.getByType<SourceSetContainer>()
 val loomExtension = extensions.getByType<LoomGradleExtensionAPI>()
 
-loomExtension.apply {
-    splitEnvironmentSourceSets()
+sourceSets.getByName("main").java.srcDir(rootProject.file("src/fabric/java"))
 
+loomExtension.apply {
     mods.register(modId) {
         sourceSet(sourceSets.getByName("main"))
-        sourceSet(sourceSets.getByName("client"))
     }
 }
 

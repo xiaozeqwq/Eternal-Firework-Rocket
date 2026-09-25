@@ -3,12 +3,12 @@ package xiaoze_qwq_.eternal_firework_rocket.util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.storage.LevelResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import xiaoze_qwq_.eternal_firework_rocket.platform.Platform;
 
 import java.io.*;
 import java.lang.reflect.Type;
@@ -32,8 +32,8 @@ public class PlayerConversionTracker {
     private PlayerConversionTracker() {}
 
     /** Registers world-independent events. Call once during mod initialization. */
-    public static void registerEvents() {
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> registerPlayer(handler.getPlayer()));
+    public static void registerEvents(Platform platform) {
+        platform.onPlayerJoin(PlayerConversionTracker::registerPlayer);
     }
 
     /** Called when the server finished loading a world. */
