@@ -8,31 +8,33 @@ permissions:
 
 jobs:
   build:
-    name: ${{ matrix.mc }}
+    name: ${{ matrix.mc }} (${{ matrix.loader }})
     runs-on: ubuntu-24.04
     timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
-        mc:
-          - "1.20.1"
-          - "1.20.2"
-          - "1.20.3"
-          - "1.20.4"
-          - "1.20.5"
-          - "1.20.6"
-          - "1.21"
-          - "1.21.1"
-          - "1.21.2"
-          - "1.21.3"
-          - "1.21.4"
-          - "1.21.5"
-          - "1.21.6"
-          - "1.21.7"
-          - "1.21.8"
-          - "1.21.9"
-          - "1.21.10"
-          - "1.21.11"
+        include:
+          - { mc: "1.20.1", loader: fabric }
+          - { mc: "1.20.2", loader: fabric }
+          - { mc: "1.20.3", loader: fabric }
+          - { mc: "1.20.4", loader: fabric }
+          - { mc: "1.20.5", loader: fabric }
+          - { mc: "1.20.6", loader: fabric }
+          - { mc: "1.21", loader: fabric }
+          - { mc: "1.21.1", loader: fabric }
+          - { mc: "1.21.2", loader: fabric }
+          - { mc: "1.21.3", loader: fabric }
+          - { mc: "1.21.4", loader: fabric }
+          - { mc: "1.21.5", loader: fabric }
+          - { mc: "1.21.6", loader: fabric }
+          - { mc: "1.21.7", loader: fabric }
+          - { mc: "1.21.8", loader: fabric }
+          - { mc: "1.21.9", loader: fabric }
+          - { mc: "1.21.10", loader: fabric }
+          - { mc: "1.21.11", loader: fabric }
+          - { mc: "1.21.1", loader: neoforge }
+          - { mc: "1.21.11", loader: neoforge }
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
@@ -47,18 +49,18 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: make gradle wrapper executable
         run: chmod +x ./gradlew
-      - name: build Minecraft ${{ matrix.mc }}
+      - name: build Minecraft ${{ matrix.mc }} (${{ matrix.loader }})
         env:
           SC_VERSION: ${{ matrix.mc }}
           SC_DETACHED: "true"
           GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
-        run: ./gradlew :${{ matrix.mc }}-fabric:build --stacktrace --no-daemon
+        run: ./gradlew :${{ matrix.mc }}-${{ matrix.loader }}:build --stacktrace --no-daemon
 
       # 把构建出来的 jar 重命名，加上 +<mc> 后缀
       - name: rename jars with mc suffix
         shell: bash
         run: |
-          cd versions/${{ matrix.mc }}-fabric/build/libs/
+          cd versions/${{ matrix.mc }}-${{ matrix.loader }}/build/libs/
           mc="${{ matrix.mc }}"
           for f in *.jar; do
             case "$f" in
@@ -75,7 +77,7 @@ jobs:
       - name: upload jar
         uses: actions/upload-artifact@v4
         with:
-          name: jar-${{ matrix.mc }}
-          path: versions/${{ matrix.mc }}-fabric/build/libs/
+          name: jar-${{ matrix.mc }}-${{ matrix.loader }}
+          path: versions/${{ matrix.mc }}-${{ matrix.loader }}/build/libs/
           if-no-files-found: error
           retention-days: 7

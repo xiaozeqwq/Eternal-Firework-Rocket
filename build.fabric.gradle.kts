@@ -70,6 +70,7 @@ tasks.processResources {
             )
         )
     }
+    exclude("META-INF/neoforge.mods.toml", "META-INF/mods.toml")
 }
 
 publishing {
