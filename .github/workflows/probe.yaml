@@ -1,0 +1,42 @@
+name: probe
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+      - name: setup jdk
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: setup gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: make gradle wrapper executable
+        run: chmod +x ./gradlew
+      - name: probe fabric 1.20.1
+        env:
+          SC_VERSION: "1.20.1"
+          SC_DETACHED: "true"
+          GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
+        run: ./gradlew :1.20.1-fabric:build --stacktrace --no-daemon
+      - name: probe forge 1.20.1
+        env:
+          SC_VERSION: "1.20.1"
+          SC_DETACHED: "true"
+          GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
+        run: ./gradlew :1.20.1-forge:build --stacktrace --no-daemon
+      - name: probe neoforge 1.21.1
+        env:
+          SC_VERSION: "1.21.1"
+          SC_DETACHED: "true"
+          GRADLE_OPTS: -Dorg.gradle.daemon=false -Dorg.gradle.vfs.watch=false
+        run: ./gradlew :1.21.1-neoforge:build --stacktrace --no-daemon
