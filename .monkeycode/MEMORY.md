@@ -62,8 +62,10 @@ This file records user instructions, preferences, and teachings for reference in
 
 [Project Knowledge Summary]
 - Date: 2026-09-27
-- Context: Discovered by Agent while running the 35-job multiloader CI matrix
+- Context: Discovered by Agent while running the full multiloader CI matrix (37 jobs)
 - Category: Troubleshooting & Debugging
 - Instructions:
   - NeoForge jobs may fail with HTTP 502 from `https://maven.neoforged.net/mojang-meta/...` during `createMinecraftArtifacts` (resolving `net.neoforged:minecraft-dependencies:<mc>`). This is upstream flakiness, not a code issue; rerun only the failed jobs with `/tmp/opencode/gh.sh run rerun <runId> --failed -R xiaozeqwq/Eternal-Firework-Rocket`.
   - `git push` occasionally fails with `gnutls_handshake() failed`; retry with a short loop.
+  - Forge 1.20 (46.x) lacks the `LootTable#addPool`/`getPool`/`removePool` patch that was added in Forge 1.20.1. Loot injection on 1.20 must mutate the mutable `pools` field via reflection, trying both the official dev name (`pools`) and the SRG name (`f_79109_`). `src/main/.../loot/ForgeLootEvents.java` handles this with a `//? if >=1.20.1` conditional.
+  - Minecraft `1.20` is the floor version for this project (Fabric + Forge). Forge does not support 1.20.5, so `loadersFor()` excludes forge for `1.20.5`.

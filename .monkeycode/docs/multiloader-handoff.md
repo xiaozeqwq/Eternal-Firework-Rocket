@@ -4,12 +4,16 @@ Last updated: 2026-09-27
 
 ## Status
 
-- Full CI matrix is GREEN: 35 jobs = 18 Fabric + 12 NeoForge + 5 Forge.
-  Verified by run `36321081634` on commit `46a235f` (all jobs `success`).
-- Fabric 18 versions (1.20.1 .. 1.21.11): Loom `1.17.21`, official Mojang mappings.
+- Full CI matrix is GREEN: 37 jobs = 19 Fabric + 12 NeoForge + 6 Forge.
+  Verified by run `36324019147` on commit `a507c65` (all jobs `success`).
+- Fabric 19 versions (1.20 .. 1.21.11): Loom `1.17.21`, official Mojang mappings.
 - NeoForge 12 versions (all 1.21.x): ModDevGradle `2.0.147`.
-- Forge 5 versions (1.20.1, 1.20.2, 1.20.3, 1.20.4, 1.20.6; no Forge 1.20.5):
+- Forge 6 versions (1.20, 1.20.1, 1.20.2, 1.20.3, 1.20.4, 1.20.6; no Forge 1.20.5):
   ForgeGradle `7.0.40`.
+- `1.20 (forge)` needs special loot handling: Forge 1.20 (46.x) predates the
+  `LootTable#addPool` patch, so `ForgeLootEvents` uses `addPool` on `>=1.20.1` and
+  falls back to the mutable `pools` list via reflection on `1.20` (tries both the
+  official dev name `pools` and the SRG name `f_79109_`).
 - Sources are shared across loaders and use Stonecutter loader/version conditionals.
 - CI builds one Stonecutter node per job and uploads a jar artifact.
 
@@ -47,7 +51,7 @@ Last updated: 2026-09-27
 
 ## Release Pipeline (updated, not yet exercised end-to-end)
 
-- `.github/workflows/build.yml` now builds the full 35-node matrix
+- `.github/workflows/build.yml` now builds the full 37-node matrix
   (`:<mc>-<loader>:build`) and uploads `jar-<mc>-<loader>`. `package`/`release`/`cleanup`
   are unchanged in shape: the GitHub Release gets every non-sources/dev/javadoc jar.
 - `.github/workflows/modrinth.yml` `prepare` now derives `loader` from the jar filename
