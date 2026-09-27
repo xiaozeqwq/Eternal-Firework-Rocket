@@ -13,8 +13,7 @@ pluginManagement {
 }
 
 plugins {
-    id("dev.kikugie.stonecutter") version "0.9.5"
-    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+    id("dev.kikugie.stonecutter") version "0.9.8"
 }
 
 stonecutter {
@@ -27,11 +26,11 @@ stonecutter {
         val active = "1.21.11"
 
         // Loader support per Minecraft version.
-        // Fabric: every supported version. NeoForge: 1.21.x. Forge: 1.20.x (no 1.20.5 release).
+        // Fabric: every supported version. NeoForge: 1.21.x.
+        // (Forge is not wired here: ForgeGradle 6 requires Gradle < 9, while Stonecutter 0.9 requires Gradle >= 9.)
         fun loadersFor(version: String): List<String> = buildList {
             add("fabric")
             if (version.startsWith("1.21")) add("neoforge")
-            if (version.startsWith("1.20") && version != "1.20.5") add("forge")
         }
 
         fun createFor(version: String) {
