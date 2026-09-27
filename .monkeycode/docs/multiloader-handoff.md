@@ -45,13 +45,18 @@ Last updated: 2026-09-27
   plugin, but FG7 "magic" handles it automatically for the standard official-mappings
   case; the 5 Forge jobs build without applying renamer explicitly.
 
-## Remaining
+## Release Pipeline (updated, not yet exercised end-to-end)
 
-1. Release workflows still assume Fabric only:
-   - `.github/workflows/build.yml` builds `:<mc>-fabric:build` and tags jars `jar-<mc>`.
-   - `.github/workflows/modrinth.yml` hardcodes `loaders: fabric` and parses the mc
-     version from the `+<mc>.jar` suffix. Needs a loader dimension (fabric/neoforge/forge)
-     and `loaders` set per jar.
+- `.github/workflows/build.yml` now builds the full 35-node matrix
+  (`:<mc>-<loader>:build`) and uploads `jar-<mc>-<loader>`. `package`/`release`/`cleanup`
+  are unchanged in shape: the GitHub Release gets every non-sources/dev/javadoc jar.
+- `.github/workflows/modrinth.yml` `prepare` now derives `loader` from the jar filename
+  (`*-neoforge-*` -> neoforge, `*-forge-*` -> forge, else fabric) in addition to `mc`.
+- Each Modrinth publish uses a unique version number
+  `<mod_version>+mc<mc>-<loader>` and sets `loaders: <loader>` / `game-versions: <mc>`.
+  This fixes the previous bug where every jar published under the same version number.
+- Not run yet: `build.yml` creates a real tag/release, which then triggers `modrinth.yml`
+  (needs `MODRINTH_TOKEN`). Run the Test workflow for build verification first.
 
 ## CI Verification Loop
 

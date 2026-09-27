@@ -64,7 +64,12 @@ jobs:
               echo "skip: cannot parse mc version from $name" >&2
               continue
             fi
-            entry=$(jq -n --arg jar "$name" --arg mc "$mc" '{jar:$jar, mc:$mc}')
+            case "$name" in
+              *-neoforge-*) loader=neoforge ;;
+              *-forge-*) loader=forge ;;
+              *) loader=fabric ;;
+            esac
+            entry=$(jq -n --arg jar "$name" --arg mc "$mc" --arg loader "$loader" '{jar:$jar, mc:$mc, loader:$loader}')
             entries=$(echo "$entries" | jq --argjson e "$entry" '. + [$e]')
           done
           matrix=$(echo "$entries" | jq -c '{include: .}')
@@ -72,7 +77,7 @@ jobs:
           echo "generated matrix: $matrix"
 
   publish:
-    name: publish ${{ matrix.mc }}
+    name: publish ${{ matrix.mc }} (${{ matrix.loader }})
     runs-on: ubuntu-24.04
     needs: prepare
     strategy:
@@ -97,10 +102,10 @@ jobs:
         with:
           modrinth-id: eternal-firework-rocket
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
-          version: ${{ needs.prepare.outputs.mod_version }}
-          name: "Eternal Firework Rocket ${{ needs.prepare.outputs.mod_version }}+mc${{ matrix.mc }}"
+          version: ${{ needs.prepare.outputs.mod_version }}+mc${{ matrix.mc }}-${{ matrix.loader }}
+          name: "Eternal Firework Rocket ${{ needs.prepare.outputs.mod_version }}+mc${{ matrix.mc }} (${{ matrix.loader }})"
           version-type: release
-          loaders: fabric
+          loaders: ${{ matrix.loader }}
           game-versions: ${{ matrix.mc }}
           files: jars/${{ matrix.jar }}
           changelog: ${{ needs.prepare.outputs.changelog }}
