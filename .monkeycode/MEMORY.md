@@ -69,3 +69,13 @@ This file records user instructions, preferences, and teachings for reference in
   - `git push` occasionally fails with `gnutls_handshake() failed`; retry with a short loop.
   - Forge 1.20 (46.x) lacks the `LootTable#addPool`/`getPool`/`removePool` patch that was added in Forge 1.20.1. Loot injection on 1.20 must mutate the mutable `pools` field via reflection, trying both the official dev name (`pools`) and the SRG name (`f_79109_`). `src/main/.../loot/ForgeLootEvents.java` handles this with a `//? if >=1.20.1` conditional.
   - Minecraft `1.20` is the floor version for this project (Fabric + Forge). Forge does not support 1.20.5, so `loadersFor()` excludes forge for `1.20.5`.
+
+[Project Knowledge Summary]
+- Date: 2026-09-27
+- Context: Discovered by Agent while exercising the release pipeline (build.yml -> modrinth.yml) for v1.0.8
+- Category: Operations & Deployment
+- Instructions:
+  - Release flow: bump `mod.version` in `gradle.properties`, push, then run `build.yml` (workflow_dispatch). It builds the 37-node matrix and creates GitHub Release `v<mod.version>` with all jars.
+  - `modrinth.yml` (`on: release: published`) does NOT auto-run for a release created by `build.yml`, because GitHub suppresses workflow runs for events created with the default `GITHUB_TOKEN`. Dispatch it manually: `/tmp/opencode/gh.sh workflow run modrinth.yml --ref main -R xiaozeqwq/Eternal-Firework-Rocket`.
+  - `modrinth.yml` derives its publish matrix from the latest release's jar filenames (loader from `-neoforge-`/`-forge-` in `archivesName`, mc from the `+<mc>` suffix); no edits needed when versions are added.
+  - `MODRINTH_TOKEN` secret is configured; each publish is `<ver>+mc<mc>-<loader>`.

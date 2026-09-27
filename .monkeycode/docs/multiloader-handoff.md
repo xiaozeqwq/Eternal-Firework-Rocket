@@ -49,9 +49,20 @@ Last updated: 2026-09-27
   plugin, but FG7 "magic" handles it automatically for the standard official-mappings
   case; the 5 Forge jobs build without applying renamer explicitly.
 
-## Release Pipeline (updated, not yet exercised end-to-end)
+## Release Pipeline (verified end-to-end on v1.0.8)
 
-- `.github/workflows/build.yml` now builds the full 37-node matrix
+- `build.yml` was run for `1.0.8` (run `36324757133`, 40/40 jobs: 37 build +
+  package + release + cleanup) and produced the GitHub Release `v1.0.8` with all
+  74 assets (37 jars + 37 sources jars).
+- `modrinth.yml` does NOT auto-trigger from that release: GitHub suppresses
+  workflow runs caused by events created with the default `GITHUB_TOKEN`
+  (`release: published`). Dispatch it manually:
+  `/tmp/opencode/gh.sh workflow run modrinth.yml --ref main`.
+- `modrinth.yml` run `36325339055` (1 prepare + 37 publish, all success) published
+  37 unique Modrinth versions `<ver>+mc<mc>-<loader>`, each with the right
+  `loaders` and `game-versions` (verified via the Modrinth API).
+
+- `.github/workflows/build.yml` builds the full 37-node matrix
   (`:<mc>-<loader>:build`) and uploads `jar-<mc>-<loader>`. `package`/`release`/`cleanup`
   are unchanged in shape: the GitHub Release gets every non-sources/dev/javadoc jar.
 - `.github/workflows/modrinth.yml` `prepare` now derives `loader` from the jar filename
@@ -59,8 +70,9 @@ Last updated: 2026-09-27
 - Each Modrinth publish uses a unique version number
   `<mod_version>+mc<mc>-<loader>` and sets `loaders: <loader>` / `game-versions: <mc>`.
   This fixes the previous bug where every jar published under the same version number.
-- Not run yet: `build.yml` creates a real tag/release, which then triggers `modrinth.yml`
-  (needs `MODRINTH_TOKEN`). Run the Test workflow for build verification first.
+- Release loader detection relies on the jar naming from the build scripts:
+  `archivesName = $modId-$mcVersion-<loader>` for forge/neoforge (so `-<loader>-`
+  appears in the name) and `$modId-$mcVersion` for fabric (defaults to fabric).
 
 ## CI Verification Loop
 
