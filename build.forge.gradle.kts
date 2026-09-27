@@ -1,7 +1,10 @@
+import net.minecraftforge.gradle.ForgeGradleExtensionForProject
+import net.minecraftforge.gradle.MinecraftExtensionForProject
 import org.gradle.api.tasks.SourceSetContainer
 
 plugins {
-    id("net.minecraftforge.gradle") version "6.0.54"
+    id("java")
+    id("net.minecraftforge.gradle") version "7.0.40"
 }
 
 val mcVersion = sc.current.version
@@ -18,21 +21,23 @@ base {
     archivesName = "$modId-$mcVersion-forge"
 }
 
+val minecraft = extensions.getByType<MinecraftExtensionForProject>()
+val fg = extensions.getByType<ForgeGradleExtensionForProject>()
+
 repositories {
-    maven("https://maven.minecraftforge.net")
+    minecraft.mavenizer(this)
+    maven(fg.forgeMaven)
+    maven(fg.minecraftLibsMaven)
     mavenCentral()
-    maven("https://libraries.minecraft.net")
 }
 
-minecraft {
-    mappings("official", mcVersion)
-}
+minecraft.mappings("official", mcVersion)
 
 val sourceSets = extensions.getByType<SourceSetContainer>()
 sourceSets.getByName("main").java.srcDir(rootProject.file("src/forge/java"))
 
 dependencies {
-    "minecraft"("net.minecraftforge:forge:$mcVersion-$forgeVersion")
+    "implementation"(minecraft.dependency("net.minecraftforge:forge:$mcVersion-$forgeVersion"))
 }
 
 java {
