@@ -72,7 +72,9 @@ public class InvisibleFireworkRocketEntity extends Entity {
                 rotation.z * 0.1 + (rotation.z * 1.5 - velocity.z) * 0.5
             )
         );
+        //? if <26.1 {
         shooter.hurtMarked = true;
+        //?}
 
         Vec3 handOffset = shooter.getHandHoldingItemAngle(Items.FIREWORK_ROCKET);
         this.setPos(shooter.getX() + handOffset.x, shooter.getY() + handOffset.y, shooter.getZ() + handOffset.z);

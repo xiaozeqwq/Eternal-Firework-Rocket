@@ -4,6 +4,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -75,11 +76,16 @@ public class EternalFireworkRocketItem extends Item {
 
             user.awardStat(Stats.ITEM_USED.get(this));
 
+            //? if >=26.1 {
+            RandomSource particleRandom = world.getRandom();
+            //?} else {
+            /*RandomSource particleRandom = world.random;
+            *///?}
             for (int i = 0; i < 10; i++) {
                 world.addParticle(ParticleTypes.FIREWORK,
-                        user.getX() + (world.random.nextDouble() - 0.5) * 0.5,
-                        user.getY() + world.random.nextDouble() * 1.0,
-                        user.getZ() + (world.random.nextDouble() - 0.5) * 0.5,
+                        user.getX() + (particleRandom.nextDouble() - 0.5) * 0.5,
+                        user.getY() + particleRandom.nextDouble() * 1.0,
+                        user.getZ() + (particleRandom.nextDouble() - 0.5) * 0.5,
                         0, 0, 0);
             }
         }

@@ -70,7 +70,9 @@ public class UltimateFireworkRocketEntity extends Entity {
         double newVelY = vel.y * DAMPING + look.y * FORCE;
         double newVelZ = vel.z * DAMPING + look.z * FORCE;
         shooter.setDeltaMovement(newVelX, newVelY, newVelZ);
+        //? if <26.1 {
         shooter.hurtMarked = true;
+        //?}
 
         Level entityWorld = level();
         Vec3 pos = shooter.position();

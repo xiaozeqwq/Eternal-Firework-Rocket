@@ -4,7 +4,11 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
+//? if >=26.1 {
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
+//?} else {
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+//?}
 import xiaoze_qwq_.eternal_firework_rocket.EternalFireworkRocket;
 import xiaoze_qwq_.eternal_firework_rocket.config.ModConfig;
 import xiaoze_qwq_.eternal_firework_rocket.platform.Platform;
@@ -53,7 +57,11 @@ public class ModLootTableModifier {
 
     public static LootPool.Builder makePool(int flight, double chancePercent) {
         LootPool.Builder pool = LootPool.lootPool()
+                //? if >=26.1 {
+                .setRolls(ContextIntProviders.exactly(1))
+                //?} else {
                 .setRolls(ConstantValue.exactly(1))
+                //?}
                 .add(LootItem.lootTableItem(EternalFireworkRocket.ETERNAL_FIREWORK_ROCKET))
                 .when(LootItemRandomChanceCondition.randomChance((float) (chancePercent / 100.0)));
         //? if >=1.20.5 {
