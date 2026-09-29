@@ -50,11 +50,16 @@ loomExtension.apply {
 
 dependencies {
     add("minecraft", "com.mojang:minecraft:$mcVersion")
-    if (!unobfuscated) {
+    if (unobfuscated) {
+        // Unobfuscated Minecraft: Loom creates no remap configurations, and mods
+        // are published in the official namespace, so plain configurations are used.
+        add("implementation", "net.fabricmc:fabric-loader:$fabricLoaderVersion")
+        add("implementation", "net.fabricmc.fabric-api:fabric-api:$fabricApiVersion")
+    } else {
         add("mappings", loomExtension.officialMojangMappings())
+        add("modImplementation", "net.fabricmc:fabric-loader:$fabricLoaderVersion")
+        add("modImplementation", "net.fabricmc.fabric-api:fabric-api:$fabricApiVersion")
     }
-    add("modImplementation", "net.fabricmc:fabric-loader:$fabricLoaderVersion")
-    add("modImplementation", "net.fabricmc.fabric-api:fabric-api:$fabricApiVersion")
 }
 
 java {
