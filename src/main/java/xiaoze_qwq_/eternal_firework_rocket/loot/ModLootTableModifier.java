@@ -4,7 +4,7 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceCondition;
-//? if >=26.1 {
+//? if >=26.3 {
 import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 //?} else {
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
@@ -57,7 +57,7 @@ public class ModLootTableModifier {
 
     public static LootPool.Builder makePool(int flight, double chancePercent) {
         LootPool.Builder pool = LootPool.lootPool()
-                //? if >=26.1 {
+                //? if >=26.3 {
                 .setRolls(ContextIntProviders.exactly(1))
                 //?} else {
                 .setRolls(ConstantValue.exactly(1))

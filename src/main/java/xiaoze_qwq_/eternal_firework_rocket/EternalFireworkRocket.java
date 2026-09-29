@@ -75,7 +75,7 @@ public class EternalFireworkRocket {
                 if (hand != null) {
                     player.setItemInHand(hand, new ItemStack(ULTIMATE_FIREWORK_ROCKET_ITEM));
                     PlayerConversionTracker.setConverted(player, true);
-                    //? if >=26.1 {
+                    //? if >=26.3 {
                     player.sendOverlayMessage(Component.translatable("message.eternal-firework-rocket.evolution"));
                     //?} else {
                     /*player.displayClientMessage(Component.translatable("message.eternal-firework-rocket.evolution"), true);

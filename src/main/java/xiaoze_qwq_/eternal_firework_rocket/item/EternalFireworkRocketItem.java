@@ -76,7 +76,7 @@ public class EternalFireworkRocketItem extends Item {
 
             user.awardStat(Stats.ITEM_USED.get(this));
 
-            //? if >=26.1 {
+            //? if >=26.3 {
             RandomSource particleRandom = world.getRandom();
             //?} else {
             /*RandomSource particleRandom = world.random;

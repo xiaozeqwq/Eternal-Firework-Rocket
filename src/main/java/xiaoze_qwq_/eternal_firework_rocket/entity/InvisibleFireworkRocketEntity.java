@@ -72,7 +72,7 @@ public class InvisibleFireworkRocketEntity extends Entity {
                 rotation.z * 0.1 + (rotation.z * 1.5 - velocity.z) * 0.5
             )
         );
-        //? if <26.1 {
+        //? if <26.3 {
         shooter.hurtMarked = true;
         //?}
 
