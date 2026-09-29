@@ -13,7 +13,11 @@ val mavenGroup = property("mod.group") as String
 val fabricApiVersion = property("deps.fabric_api_version") as String
 val fabricLoaderVersion = property("deps.fabric_loader") as String
 
-val javaVersion = if (sc.current.parsed >= "1.20.5") JavaVersion.VERSION_21 else JavaVersion.VERSION_17
+val javaVersion = when {
+    sc.current.parsed >= "26.1" -> JavaVersion.VERSION_25
+    sc.current.parsed >= "1.20.5" -> JavaVersion.VERSION_21
+    else -> JavaVersion.VERSION_17
+}
 
 group = mavenGroup
 version = "$modVersion+$mcVersion"

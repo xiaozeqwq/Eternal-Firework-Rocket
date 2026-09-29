@@ -1,5 +1,5 @@
 [versions]
-loom = "1.17.21"
+loom = "1.18.2"
 stonecutter = "0.9.8"
 
 [plugins]
