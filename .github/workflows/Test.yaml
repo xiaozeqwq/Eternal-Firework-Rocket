@@ -15,6 +15,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - { mc: "26.1", loader: fabric, java: "25" }
+          - { mc: "26.1.1", loader: fabric, java: "25" }
+          - { mc: "26.1.2", loader: fabric, java: "25" }
+          - { mc: "26.2", loader: fabric, java: "25" }
           - { mc: "26.3", loader: fabric, java: "25" }
     steps:
       - name: checkout repository
