@@ -13,6 +13,10 @@ val mavenGroup = property("mod.group") as String
 val fabricApiVersion = property("deps.fabric_api_version") as String
 val fabricLoaderVersion = property("deps.fabric_loader") as String
 
+// Minecraft 26.x (released after 2025-11-01) ships unobfuscated, so Mojang no longer
+// publishes official mappings. Loom is told to skip obfuscation handling instead.
+val unobfuscated = sc.current.parsed >= "26.1"
+
 val javaVersion = when {
     sc.current.parsed >= "26.1" -> JavaVersion.VERSION_25
     sc.current.parsed >= "1.20.5" -> JavaVersion.VERSION_21
@@ -46,7 +50,9 @@ loomExtension.apply {
 
 dependencies {
     add("minecraft", "com.mojang:minecraft:$mcVersion")
-    add("mappings", loomExtension.officialMojangMappings())
+    if (!unobfuscated) {
+        add("mappings", loomExtension.officialMojangMappings())
+    }
     add("modImplementation", "net.fabricmc:fabric-loader:$fabricLoaderVersion")
     add("modImplementation", "net.fabricmc.fabric-api:fabric-api:$fabricApiVersion")
 }
