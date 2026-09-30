@@ -35,6 +35,11 @@ jobs:
           - { mc: "1.21.9", loader: fabric }
           - { mc: "1.21.10", loader: fabric }
           - { mc: "1.21.11", loader: fabric }
+          - { mc: "26.1", loader: fabric, java: "25" }
+          - { mc: "26.1.1", loader: fabric, java: "25" }
+          - { mc: "26.1.2", loader: fabric, java: "25" }
+          - { mc: "26.2", loader: fabric, java: "25" }
+          - { mc: "26.3", loader: fabric, java: "25" }
           - { mc: "1.21", loader: neoforge }
           - { mc: "1.21.1", loader: neoforge }
           - { mc: "1.21.2", loader: neoforge }
@@ -61,7 +66,7 @@ jobs:
       - name: setup jdk
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: ${{ matrix.java || '21' }}
           distribution: 'temurin'
       - name: setup gradle
         uses: gradle/actions/setup-gradle@v4
