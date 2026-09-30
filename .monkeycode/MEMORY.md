@@ -75,7 +75,18 @@ This file records user instructions, preferences, and teachings for reference in
 - Context: Discovered by Agent while exercising the release pipeline (build.yml -> modrinth.yml) for v1.0.8
 - Category: Operations & Deployment
 - Instructions:
-  - Release flow: bump `mod.version` in `gradle.properties`, push, then run `build.yml` (workflow_dispatch). It builds the 37-node matrix and creates GitHub Release `v<mod.version>` with all jars.
+  - Release flow: bump `mod.version` in `gradle.properties`, push, then run `build.yml` (workflow_dispatch). It builds the 42-node matrix and creates GitHub Release `v<mod.version>` with all jars.
   - `modrinth.yml` (`on: release: published`) does NOT auto-run for a release created by `build.yml`, because GitHub suppresses workflow runs for events created with the default `GITHUB_TOKEN`. Dispatch it manually: `/tmp/opencode/gh.sh workflow run modrinth.yml --ref main -R xiaozeqwq/Eternal-Firework-Rocket`.
   - `modrinth.yml` derives its publish matrix from the latest release's jar filenames (loader from `-neoforge-`/`-forge-` in `archivesName`, mc from the `+<mc>` suffix); no edits needed when versions are added.
   - `MODRINTH_TOKEN` secret is configured; each publish is `<ver>+mc<mc>-<loader>`.
+
+[Project Knowledge Summary]
+- Date: 2026-09-30
+- Context: Discovered by Agent while adding Fabric 26.x (26.1, 26.1.1, 26.1.2, 26.2, 26.3) support and verifying it in CI
+- Category: Build Methods
+- Instructions:
+  - 26.x is Fabric-only in this repo (`loadersFor()` returns fabric for any version not starting with `1.20`/`1.21`). CI matrix is now 42 jobs: 19 fabric (1.20 .. 1.21.11) + 5 fabric 26.x + 12 neoforge + 6 forge.
+  - 26.x jars are unobfuscated (no `client_mappings`). Set `fabric.loom.disableObfuscation=true` in `versions/26.x-fabric/gradle.properties`; then Loom creates no remap configurations, so use plain `implementation` (not `modImplementation`) and skip `mappings`/`officialMojangMappings()`. `build.fabric.gradle.kts` branches on `sc.current.parsed >= "26.1"`.
+  - 26.x needs Java 25 toolchain and Loom `1.18.2`. CRITICAL: Loom 1.18.2 is on the buildscript classpath of EVERY subproject (fabric, neoforge, forge) and requires a JVM 25 runtime, so ALL CI jobs must run on Java 25. A Java 25 JDK still compiles the older nodes targeting `--release` 17/21, so no per-node Java split is needed.
+  - API boundaries (Stonecutter guards): since 26.1, `Level.random` is protected (use `world.getRandom()`) and `Player.displayClientMessage` was removed (use `sendOverlayMessage` for the action bar). Since 26.3, `Entity.hurtMarked` was removed (fall-flying shooter velocity sync is automatic in `ServerEntity`, so guard the field write out) and the loot number providers were reorganized: use `net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders.exactly(int)` (returns `Holder`, accepted by `LootPool.Builder.setRolls`) plus `...number.ints.ConstantValue` / `...number.floats.ConstantValue` in place of the old `...number.ConstantValue`.
+  - 26.x fabric-api versions used: 26.1=0.145.1+26.1, 26.1.1=0.145.4+26.1.1, 26.1.2=0.155.3+26.1.2, 26.2=0.161.0+26.2, 26.3=0.161.0+26.3.

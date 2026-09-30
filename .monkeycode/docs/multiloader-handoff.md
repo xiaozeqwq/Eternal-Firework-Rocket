@@ -1,12 +1,15 @@
-# Multiloader Handoff (Fabric + NeoForge + Forge all GREEN)
+# Multiloader Handoff (Fabric + NeoForge + Forge + Fabric 26.x all GREEN)
 
-Last updated: 2026-09-27
+Last updated: 2026-09-30
 
 ## Status
 
-- Full CI matrix is GREEN: 37 jobs = 19 Fabric + 12 NeoForge + 6 Forge.
-  Verified by run `36324019147` on commit `a507c65` (all jobs `success`).
-- Fabric 19 versions (1.20 .. 1.21.11): Loom `1.17.21`, official Mojang mappings.
+- Full CI matrix is GREEN: 42 jobs = 19 Fabric (1.20 .. 1.21.11) + 5 Fabric 26.x
+  + 12 NeoForge + 6 Forge. Verified by run `36709829259` on commit `debf350`
+  (42/42 `success`).
+- Fabric 1.20 .. 1.21.11: official Mojang mappings.
+- Fabric 26.x (26.1, 26.1.1, 26.1.2, 26.2, 26.3): unobfuscated, Loom `1.18.2`,
+  Java 25, plain `implementation` deps (see the 26.x section below).
 - NeoForge 12 versions (all 1.21.x): ModDevGradle `2.0.147`.
 - Forge 6 versions (1.20, 1.20.1, 1.20.2, 1.20.3, 1.20.4, 1.20.6; no Forge 1.20.5):
   ForgeGradle `7.0.40`.
@@ -16,6 +19,31 @@ Last updated: 2026-09-27
   official dev name `pools` and the SRG name `f_79109_`).
 - Sources are shared across loaders and use Stonecutter loader/version conditionals.
 - CI builds one Stonecutter node per job and uploads a jar artifact.
+
+## Fabric 26.x (26.1 .. 26.3)
+
+- 26.x is Fabric-only in this repo. `loadersFor()` returns fabric for any version
+  that does not start with `1.20`/`1.21`, so the 5 new nodes are fabric.
+- 26.x is unobfuscated (Mojang ships no `client_mappings`). `build.fabric.gradle.kts`
+  sets `unobfuscated = sc.current.parsed >= "26.1"`, and the per-version props set
+  `fabric.loom.disableObfuscation=true`. In that mode Loom creates no remap
+  configurations, so the project must use plain `implementation` (not
+  `modImplementation`) and skip `mappings`/`officialMojangMappings()`.
+- 26.x uses Java 25 (toolchain) and Loom `1.18.2`. CRITICAL: Loom 1.18.2 is on the
+  buildscript classpath of EVERY subproject (fabric, neoforge, forge) and requires a
+  JVM 25 runtime, so ALL CI jobs run on Java 25. A Java 25 JDK still compiles the
+  older nodes targeting `--release` 17/21, so no per-node Java split is needed.
+- 26.x API boundaries handled with Stonecutter guards:
+  - Since 26.1: `Level.random` is protected (use `world.getRandom()`);
+    `Player.displayClientMessage` was removed (use `sendOverlayMessage` for the
+    action bar).
+  - Since 26.3: `Entity.hurtMarked` was removed (fall-flying shooter velocity sync
+    is automatic in `ServerEntity`, so guard the field write out); the loot number
+    providers moved to `...number.ints.ContextIntProviders.exactly(int)` (returns a
+    `Holder`, accepted by `LootPool.Builder.setRolls`) and
+    `...number.ints.ConstantValue` / `...number.floats.ConstantValue`.
+- fabric-api versions: 26.1=`0.145.1+26.1`, 26.1.1=`0.145.4+26.1.1`,
+  26.1.2=`0.155.3+26.1.2`, 26.2=`0.161.0+26.2`, 26.3=`0.161.0+26.3`.
 
 ## How the Build Works Now
 
@@ -49,20 +77,24 @@ Last updated: 2026-09-27
   plugin, but FG7 "magic" handles it automatically for the standard official-mappings
   case; the 5 Forge jobs build without applying renamer explicitly.
 
-## Release Pipeline (verified end-to-end on v1.0.8)
+## Release Pipeline (verified end-to-end on v1.0.9, with 26.x)
 
-- `build.yml` was run for `1.0.8` (run `36324757133`, 40/40 jobs: 37 build +
-  package + release + cleanup) and produced the GitHub Release `v1.0.8` with all
-  74 assets (37 jars + 37 sources jars).
+- `build.yml` run for `1.0.9` (run `36710673550`, 45/45 jobs: 42 build +
+  package + release + cleanup) produced the GitHub Release `v1.0.9` with 84
+  assets (42 jars + 42 sources jars), including the 5 Fabric 26.x jars.
+- `modrinth.yml` run `36711681227` (1 prepare + 42 publish, all success)
+  published 42 unique Modrinth versions `<ver>+mc<mc>-<loader>`. Verified via the
+  Modrinth API: the 5 new entries `1.0.9+mc26.{1,1.1,1.2,2,3}-fabric` carry
+  `loaders: [fabric]` and the matching `game_versions`.
 - `modrinth.yml` does NOT auto-trigger from that release: GitHub suppresses
   workflow runs caused by events created with the default `GITHUB_TOKEN`
   (`release: published`). Dispatch it manually:
   `/tmp/opencode/gh.sh workflow run modrinth.yml --ref main`.
-- `modrinth.yml` run `36325339055` (1 prepare + 37 publish, all success) published
-  37 unique Modrinth versions `<ver>+mc<mc>-<loader>`, each with the right
-  `loaders` and `game-versions` (verified via the Modrinth API).
 
-- `.github/workflows/build.yml` builds the full 37-node matrix
+Earlier verified on v1.0.8: `build.yml` run `36324757133` (40/40) -> release with
+74 assets, then `modrinth.yml` run `36325339055` (38/38) -> 37 versions.
+
+- `.github/workflows/build.yml` builds the full 42-node matrix
   (`:<mc>-<loader>:build`) and uploads `jar-<mc>-<loader>`. `package`/`release`/`cleanup`
   are unchanged in shape: the GitHub Release gets every non-sources/dev/javadoc jar.
 - `.github/workflows/modrinth.yml` `prepare` now derives `loader` from the jar filename
