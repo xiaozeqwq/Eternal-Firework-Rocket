@@ -16,11 +16,46 @@ jobs:
       matrix:
         include:
           - { mc: "1.20", loader: fabric }
+          - { mc: "1.20.1", loader: fabric }
+          - { mc: "1.20.2", loader: fabric }
+          - { mc: "1.20.3", loader: fabric }
+          - { mc: "1.20.4", loader: fabric }
+          - { mc: "1.20.5", loader: fabric }
+          - { mc: "1.20.6", loader: fabric }
+          - { mc: "1.21", loader: fabric }
+          - { mc: "1.21.1", loader: fabric }
+          - { mc: "1.21.2", loader: fabric }
+          - { mc: "1.21.3", loader: fabric }
+          - { mc: "1.21.4", loader: fabric }
+          - { mc: "1.21.5", loader: fabric }
+          - { mc: "1.21.6", loader: fabric }
+          - { mc: "1.21.7", loader: fabric }
+          - { mc: "1.21.8", loader: fabric }
+          - { mc: "1.21.9", loader: fabric }
+          - { mc: "1.21.10", loader: fabric }
           - { mc: "1.21.11", loader: fabric }
+          - { mc: "26.1", loader: fabric, java: "25" }
+          - { mc: "26.1.1", loader: fabric, java: "25" }
+          - { mc: "26.1.2", loader: fabric, java: "25" }
+          - { mc: "26.2", loader: fabric, java: "25" }
           - { mc: "26.3", loader: fabric, java: "25" }
           - { mc: "1.21", loader: neoforge }
+          - { mc: "1.21.1", loader: neoforge }
+          - { mc: "1.21.2", loader: neoforge }
+          - { mc: "1.21.3", loader: neoforge }
+          - { mc: "1.21.4", loader: neoforge }
+          - { mc: "1.21.5", loader: neoforge }
+          - { mc: "1.21.6", loader: neoforge }
+          - { mc: "1.21.7", loader: neoforge }
+          - { mc: "1.21.8", loader: neoforge }
+          - { mc: "1.21.9", loader: neoforge }
+          - { mc: "1.21.10", loader: neoforge }
           - { mc: "1.21.11", loader: neoforge }
           - { mc: "1.20", loader: forge }
+          - { mc: "1.20.1", loader: forge }
+          - { mc: "1.20.2", loader: forge }
+          - { mc: "1.20.3", loader: forge }
+          - { mc: "1.20.4", loader: forge }
           - { mc: "1.20.6", loader: forge }
     steps:
       - name: checkout repository
