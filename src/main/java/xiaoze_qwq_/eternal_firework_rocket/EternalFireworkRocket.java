@@ -23,6 +23,10 @@ import xiaoze_qwq_.eternal_firework_rocket.platform.Platform;
 import xiaoze_qwq_.eternal_firework_rocket.util.FireworkData;
 import xiaoze_qwq_.eternal_firework_rocket.util.PlayerConversionTracker;
 
+//? if >=1.20.5 {
+import net.minecraft.core.component.DataComponents;
+//?}
+
 //? if >=1.21.2 {
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -97,6 +101,9 @@ public class EternalFireworkRocket {
         Item.Properties settings = new Item.Properties();
         //? if >=1.21.2 {
         settings.setId(ResourceKey.create(Registries.ITEM, id(path)));
+        //?}
+        //? if >=1.20.5 {
+        settings.component(DataComponents.FIREWORKS, FireworkData.createComponent(FireworkData.MIN_FLIGHT));
         //?}
         return settings;
     }
