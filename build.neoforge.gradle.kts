@@ -1,7 +1,7 @@
 import org.gradle.api.tasks.SourceSetContainer
 
 plugins {
-    id("net.neoforged.moddev") version "2.0.147"
+    id("net.neoforged.moddev") version "2.0.148"
 }
 
 val mcVersion = sc.current.version
@@ -10,7 +10,7 @@ val modVersion = property("mod.version") as String
 val mavenGroup = property("mod.group") as String
 val neoForgeVersion = property("deps.neo_loader") as String
 
-val javaVersion = JavaVersion.VERSION_21
+val javaVersion = if (sc.current.parsed >= "26.1") JavaVersion.VERSION_25 else JavaVersion.VERSION_21
 
 group = mavenGroup
 version = "$modVersion+$mcVersion"

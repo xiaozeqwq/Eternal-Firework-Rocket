@@ -29,11 +29,11 @@ stonecutter {
 
         // Loader support per Minecraft version.
         // Fabric: every supported version.
-        // NeoForge: 1.21.x.
+        // NeoForge: 1.21.x and 26.x.
         // Forge: 1.20.x (no Forge release for 1.20.5).
         fun loadersFor(version: String): List<String> = buildList {
             add("fabric")
-            if (version.startsWith("1.21")) add("neoforge")
+            if (version.startsWith("1.21") || version.startsWith("26.")) add("neoforge")
             if (version.startsWith("1.20") && version != "1.20.5") add("forge")
         }
 
