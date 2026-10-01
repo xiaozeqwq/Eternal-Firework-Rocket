@@ -132,6 +132,8 @@ jobs:
     steps:
       - name: checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: download all staged jars
         uses: actions/download-artifact@v4
         with:
@@ -143,18 +145,35 @@ jobs:
         run: |
           VERSION=$(grep -E '^mod\.version=' gradle.properties | cut -d= -f2)
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-      - name: get commit message
-        id: commit
+      - name: build changelog
+        id: changelog
         run: |
-          echo "message<<EOF" >> "$GITHUB_OUTPUT"
-          git log -1 --pretty=%B >> "$GITHUB_OUTPUT"
-          echo "EOF" >> "$GITHUB_OUTPUT"
+          PREV_TAG=$(git tag --sort=-version:refname | grep -E '^v[0-9]' | head -n1 || true)
+          echo "previous tag: ${PREV_TAG:-<none>}"
+          if [ -n "$PREV_TAG" ]; then
+            RANGE="$PREV_TAG..HEAD"
+          else
+            RANGE="HEAD"
+          fi
+          NOTES=$(git log $RANGE --no-merges --pretty=format:'- %s (%h)' \
+            | sed -E 's/ Co-authored-by:.*$//' \
+            | grep -vE '^- chore: bump version' || true)
+          if [ -z "$NOTES" ]; then
+            NOTES="- Maintenance release."
+          fi
+          {
+            echo "message<<CHANGELOG_EOF"
+            echo "## What's changed"
+            echo ""
+            echo "$NOTES"
+            echo "CHANGELOG_EOF"
+          } >> "$GITHUB_OUTPUT"
       - name: create tag and release with individual jars
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.mod_version.outputs.version }}
           name: v${{ steps.mod_version.outputs.version }}
-          body: ${{ steps.commit.outputs.message }}
+          body: ${{ steps.changelog.outputs.message }}
           files: |
             all-jars/**/*.jar
             !all-jars/**/*-sources.jar
