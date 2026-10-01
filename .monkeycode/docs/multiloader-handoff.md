@@ -77,22 +77,27 @@ Last updated: 2026-09-30
   plugin, but FG7 "magic" handles it automatically for the standard official-mappings
   case; the 5 Forge jobs build without applying renamer explicitly.
 
-## Release Pipeline (verified end-to-end on v1.0.9, with 26.x)
+## Release Pipeline (verified end-to-end on v1.1.0, with 26.x)
 
-- `build.yml` run for `1.0.9` (run `36710673550`, 45/45 jobs: 42 build +
-  package + release + cleanup) produced the GitHub Release `v1.0.9` with 84
+- `build.yml` run for `1.1.0` (run `36812679917`, 45/45 jobs: 42 build +
+  package + release + cleanup) produced the GitHub Release `v1.1.0` with 84
   assets (42 jars + 42 sources jars), including the 5 Fabric 26.x jars.
-- `modrinth.yml` run `36711681227` (1 prepare + 42 publish, all success)
+- The release body is generated from the commits since the previous version tag,
+  not from a single commit. The `release` job checks out with `fetch-depth: 0`,
+  resolves the previous tag via `git tag --sort=-version:refname`, then lists
+  `git log <prev>..HEAD --no-merges` subjects (strips the `Co-authored-by:`
+  trailer, drops `chore: bump version` lines).
+- `modrinth.yml` run `36813406302` (1 prepare + 42 publish, all success)
   published 42 unique Modrinth versions `<ver>+mc<mc>-<loader>`. Verified via the
-  Modrinth API: the 5 new entries `1.0.9+mc26.{1,1.1,1.2,2,3}-fabric` carry
+  Modrinth API: the 5 new entries `1.1.0+mc26.{1,1.1,1.2,2,3}-fabric` carry
   `loaders: [fabric]` and the matching `game_versions`.
 - `modrinth.yml` does NOT auto-trigger from that release: GitHub suppresses
   workflow runs caused by events created with the default `GITHUB_TOKEN`
   (`release: published`). Dispatch it manually:
   `/tmp/opencode/gh.sh workflow run modrinth.yml --ref main`.
 
-Earlier verified on v1.0.8: `build.yml` run `36324757133` (40/40) -> release with
-74 assets, then `modrinth.yml` run `36325339055` (38/38) -> 37 versions.
+Earlier verified on v1.0.9/v1.0.8: same flow; v1.0.8 was `build.yml` `36324757133`
+(40/40) then `modrinth.yml` `36325339055` (38/38).
 
 - `.github/workflows/build.yml` builds the full 42-node matrix
   (`:<mc>-<loader>:build`) and uploads `jar-<mc>-<loader>`. `package`/`release`/`cleanup`

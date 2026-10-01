@@ -76,6 +76,8 @@ This file records user instructions, preferences, and teachings for reference in
 - Category: Operations & Deployment
 - Instructions:
   - Release flow: bump `mod.version` in `gradle.properties`, push, then run `build.yml` (workflow_dispatch). It builds the 42-node matrix and creates GitHub Release `v<mod.version>` with all jars.
+  - The GitHub Release body / Modrinth changelog is generated from the commits since the previous version tag: the `release` job checks out with `fetch-depth: 0`, picks the previous tag with `git tag --sort=-version:refname`, then lists `git log <prev>..HEAD --no-merges` subjects (strips the `Co-authored-by:` trailer, drops `chore: bump version` lines). Do not expect a hand-written changelog.
+  - Use SemVer: new loader/feature support = minor bump (e.g. `1.0.9` -> `1.1.0`); pure fixes = patch bump.
   - `modrinth.yml` (`on: release: published`) does NOT auto-run for a release created by `build.yml`, because GitHub suppresses workflow runs for events created with the default `GITHUB_TOKEN`. Dispatch it manually: `/tmp/opencode/gh.sh workflow run modrinth.yml --ref main -R xiaozeqwq/Eternal-Firework-Rocket`.
   - `modrinth.yml` derives its publish matrix from the latest release's jar filenames (loader from `-neoforge-`/`-forge-` in `archivesName`, mc from the `+<mc>` suffix); no edits needed when versions are added.
   - `MODRINTH_TOKEN` secret is configured; each publish is `<ver>+mc<mc>-<loader>`.
