@@ -1,16 +1,16 @@
-# Multiloader Handoff (Fabric + NeoForge + Forge + Fabric 26.x all GREEN)
+# Multiloader Handoff (Fabric + NeoForge + Forge on 1.20/1.21/26.x all GREEN)
 
-Last updated: 2026-09-30
+Last updated: 2026-10-02
 
 ## Status
 
-- Full CI matrix is GREEN: 42 jobs = 19 Fabric (1.20 .. 1.21.11) + 5 Fabric 26.x
-  + 12 NeoForge + 6 Forge. Verified by run `36709829259` on commit `debf350`
-  (42/42 `success`).
+- Full CI matrix is GREEN: 47 jobs = 19 Fabric (1.20 .. 1.21.11) + 5 Fabric 26.x
+  + 5 NeoForge 26.x + 12 NeoForge 1.21.x + 6 Forge. Verified by Test.yaml run
+  `36814867831` on commit `ef9171b` (47/47 `success`).
 - Fabric 1.20 .. 1.21.11: official Mojang mappings.
-- Fabric 26.x (26.1, 26.1.1, 26.1.2, 26.2, 26.3): unobfuscated, Loom `1.18.2`,
-  Java 25, plain `implementation` deps (see the 26.x section below).
-- NeoForge 12 versions (all 1.21.x): ModDevGradle `2.0.147`.
+- Fabric & NeoForge 26.x (26.1, 26.1.1, 26.1.2, 26.2, 26.3): unobfuscated, Java 25
+  (see the 26.x section below).
+- NeoForge: ModDevGradle `2.0.148` (12 versions on 1.21.x + 5 on 26.x).
 - Forge 6 versions (1.20, 1.20.1, 1.20.2, 1.20.3, 1.20.4, 1.20.6; no Forge 1.20.5):
   ForgeGradle `7.0.40`.
 - `1.20 (forge)` needs special loot handling: Forge 1.20 (46.x) predates the
@@ -20,10 +20,10 @@ Last updated: 2026-09-30
 - Sources are shared across loaders and use Stonecutter loader/version conditionals.
 - CI builds one Stonecutter node per job and uploads a jar artifact.
 
-## Fabric 26.x (26.1 .. 26.3)
+## 26.x (26.1 .. 26.3) — Fabric and NeoForge
 
-- 26.x is Fabric-only in this repo. `loadersFor()` returns fabric for any version
-  that does not start with `1.20`/`1.21`, so the 5 new nodes are fabric.
+- `loadersFor()` returns `fabric` for every version and `neoforge` for versions
+  starting with `1.21` or `26.`, so each 26.x version builds both loaders.
 - 26.x is unobfuscated (Mojang ships no `client_mappings`). `build.fabric.gradle.kts`
   sets `unobfuscated = sc.current.parsed >= "26.1"`, and the per-version props set
   `fabric.loom.disableObfuscation=true`. In that mode Loom creates no remap
@@ -44,12 +44,18 @@ Last updated: 2026-09-30
     `...number.ints.ConstantValue` / `...number.floats.ConstantValue`.
 - fabric-api versions: 26.1=`0.145.1+26.1`, 26.1.1=`0.145.4+26.1.1`,
   26.1.2=`0.155.3+26.1.2`, 26.2=`0.161.0+26.2`, 26.3=`0.161.0+26.3`.
+- NeoForge 26.x pinned loader versions: 26.1=`26.1.0.19-beta`, 26.1.1=`26.1.1.15-beta`,
+  26.1.2=`26.1.2.112`, 26.2=`26.2.0.88`, 26.3=`26.3.0.39-beta` (in
+  `versions/<mc>-neoforge/gradle.properties` as `deps.neo_loader`).
+- NeoForge 26.x uses ModDevGradle `2.0.148` and Java 25 (`build.neoforge.gradle.kts`
+  branches on `sc.current.parsed >= "26.1"`). The 26.x NeoForm is unobfuscated; NFRT
+  handles it without extra config.
 
 ## How the Build Works Now
 
 - `settings.gradle.kts`: `stonecutter create(rootProject)`; `loadersFor(version)` returns
   - `fabric` for every version,
-  - `neoforge` when the version starts with `1.21`,
+  - `neoforge` when the version starts with `1.21` or `26.`,
   - `forge` when the version starts with `1.20` and is not `1.20.5`.
   Each node is `versions/<mc>-<loader>` with buildscript `build.<loader>.gradle.kts`.
   When env `SC_VERSION` is set (CI), only that single version's nodes are created.
@@ -82,6 +88,9 @@ Last updated: 2026-09-30
 - `build.yml` run for `1.1.0` (run `36812679917`, 45/45 jobs: 42 build +
   package + release + cleanup) produced the GitHub Release `v1.1.0` with 84
   assets (42 jars + 42 sources jars), including the 5 Fabric 26.x jars.
+- `1.2.0` adds NeoForge 26.x (47-node matrix). Only the Test.yaml matrix has been
+  run for it so far (run `36814867831`, 47/47); `build.yml`/`modrinth.yml` were not
+  run for `1.2.0` at the time of writing.
 - The release body is generated from the commits since the previous version tag,
   not from a single commit. The `release` job checks out with `fetch-depth: 0`,
   resolves the previous tag via `git tag --sort=-version:refname`, then lists
@@ -99,7 +108,7 @@ Last updated: 2026-09-30
 Earlier verified on v1.0.9/v1.0.8: same flow; v1.0.8 was `build.yml` `36324757133`
 (40/40) then `modrinth.yml` `36325339055` (38/38).
 
-- `.github/workflows/build.yml` builds the full 42-node matrix
+- `.github/workflows/build.yml` builds the full 47-node matrix
   (`:<mc>-<loader>:build`) and uploads `jar-<mc>-<loader>`. `package`/`release`/`cleanup`
   are unchanged in shape: the GitHub Release gets every non-sources/dev/javadoc jar.
 - `.github/workflows/modrinth.yml` `prepare` now derives `loader` from the jar filename
