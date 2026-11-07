@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "eternal-firework-rocket",
+  "id": "eternal_firework_rocket",
   "version": "${version}",
   "name": "Eternal Firework Rocket",
   "description": "Adds eternal firework rockets that can be found in End City chests",
@@ -9,7 +9,7 @@
   ],
   "contact": {},
   "license": "MIT",
-  "icon": "assets/eternal-firework-rocket/icon.png",
+  "icon": "assets/eternal_firework_rocket/icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [

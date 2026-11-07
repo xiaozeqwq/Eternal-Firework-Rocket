@@ -56,4 +56,4 @@ stonecutter {
     }
 }
 
-rootProject.name = "eternal-firework-rocket"
+rootProject.name = "eternal_firework_rocket"

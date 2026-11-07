@@ -4,23 +4,23 @@ license = "MIT"
 issueTrackerURL = "https://github.com/xiaozeqwq/Eternal-Firework-Rocket/issues"
 
 [[mods]]
-modId = "eternal-firework-rocket"
+modId = "eternal_firework_rocket"
 version = "${version}"
 displayName = "Eternal Firework Rocket"
 authors = "xiaoze_qwq_"
 description = '''
 Adds eternal firework rockets that can be found in End City chests.
 '''
-logoFile = "assets/eternal-firework-rocket/icon.png"
+logoFile = "assets/eternal_firework_rocket/icon.png"
 
-[[dependencies.eternal-firework-rocket]]
+[[dependencies.eternal_firework_rocket]]
 modId = "forge"
 mandatory = true
 versionRange = "[${forge_dep},)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.eternal-firework-rocket]]
+[[dependencies.eternal_firework_rocket]]
 modId = "minecraft"
 mandatory = true
 versionRange = "[${mc_dep}]"

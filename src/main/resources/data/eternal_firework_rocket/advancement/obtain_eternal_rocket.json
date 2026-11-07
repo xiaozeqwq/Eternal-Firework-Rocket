@@ -1,14 +1,14 @@
 {
   "display": {
     "icon": {
-      "item": "eternal-firework-rocket:eternal_firework_rocket",
-      "id": "eternal-firework-rocket:eternal_firework_rocket"
+      "item": "eternal_firework_rocket:eternal_firework_rocket",
+      "id": "eternal_firework_rocket:eternal_firework_rocket"
     },
     "title": {
-      "translate": "advancement.eternal-firework-rocket.obtain_eternal_rocket.title"
+      "translate": "advancement.eternal_firework_rocket.obtain_eternal_rocket.title"
     },
     "description": {
-      "translate": "advancement.eternal-firework-rocket.obtain_eternal_rocket.description"
+      "translate": "advancement.eternal_firework_rocket.obtain_eternal_rocket.description"
     },
     "frame": "challenge",
     "show_toast": true,
@@ -23,7 +23,7 @@
         "items": [
           {
             "items": [
-              "eternal-firework-rocket:eternal_firework_rocket"
+              "eternal_firework_rocket:eternal_firework_rocket"
             ]
           }
         ]

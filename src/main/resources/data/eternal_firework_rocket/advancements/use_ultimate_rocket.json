@@ -1,21 +1,21 @@
 {
   "display": {
     "icon": {
-      "item": "eternal-firework-rocket:eternal_firework_rocket_ultimate",
-      "id": "eternal-firework-rocket:eternal_firework_rocket_ultimate"
+      "item": "eternal_firework_rocket:eternal_firework_rocket_ultimate",
+      "id": "eternal_firework_rocket:eternal_firework_rocket_ultimate"
     },
     "title": {
-      "translate": "advancement.eternal-firework-rocket.use_ultimate_rocket.title"
+      "translate": "advancement.eternal_firework_rocket.use_ultimate_rocket.title"
     },
     "description": {
-      "translate": "advancement.eternal-firework-rocket.use_ultimate_rocket.description"
+      "translate": "advancement.eternal_firework_rocket.use_ultimate_rocket.description"
     },
     "frame": "challenge",
     "show_toast": true,
     "announce_to_chat": true,
     "hidden": true
   },
-  "parent": "eternal-firework-rocket:obtain_eternal_rocket",
+  "parent": "eternal_firework_rocket:obtain_eternal_rocket",
   "criteria": {
     "has_ultimate": {
       "trigger": "minecraft:inventory_changed",
@@ -23,7 +23,7 @@
         "items": [
           {
             "items": [
-              "eternal-firework-rocket:eternal_firework_rocket_ultimate"
+              "eternal_firework_rocket:eternal_firework_rocket_ultimate"
             ]
           }
         ]

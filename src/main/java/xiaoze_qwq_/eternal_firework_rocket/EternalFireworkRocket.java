@@ -33,7 +33,7 @@ import net.minecraft.resources.ResourceKey;
 //?}
 
 public class EternalFireworkRocket {
-    public static final String MOD_ID = "eternal-firework-rocket";
+    public static final String MOD_ID = "eternal_firework_rocket";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     private static final double EVOLUTION_Y = 114514.0;
@@ -80,9 +80,9 @@ public class EternalFireworkRocket {
                     player.setItemInHand(hand, new ItemStack(ULTIMATE_FIREWORK_ROCKET_ITEM));
                     PlayerConversionTracker.setConverted(player, true);
                     //? if >=26.1 {
-                    player.sendOverlayMessage(Component.translatable("message.eternal-firework-rocket.evolution"));
+                    player.sendOverlayMessage(Component.translatable("message.eternal_firework_rocket.evolution"));
                     //?} else {
-                    /*player.displayClientMessage(Component.translatable("message.eternal-firework-rocket.evolution"), true);
+                    /*player.displayClientMessage(Component.translatable("message.eternal_firework_rocket.evolution"), true);
                     *///?}
                 }
             }

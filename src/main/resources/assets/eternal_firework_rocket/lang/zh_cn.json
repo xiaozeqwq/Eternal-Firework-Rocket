@@ -1,0 +1,9 @@
+{
+  "item.eternal_firework_rocket.eternal_firework_rocket": "永恒烟花火箭",
+  "item.eternal_firework_rocket.eternal_firework_rocket_ultimate": "终极永恒烟花火箭",
+  "advancement.eternal_firework_rocket.obtain_eternal_rocket.title": "无限的烟花火箭？",
+  "advancement.eternal_firework_rocket.obtain_eternal_rocket.description": "获得一个永恒烟花火箭",
+  "advancement.eternal_firework_rocket.use_ultimate_rocket.title": "烟花超跑",
+  "advancement.eternal_firework_rocket.use_ultimate_rocket.description": "使用终极永恒烟花火箭飞行",
+  "message.eternal_firework_rocket.evolution": "§d你的永恒烟花火箭进化成了终极永恒烟花火箭！"
+}
